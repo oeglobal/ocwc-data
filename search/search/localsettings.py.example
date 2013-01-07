@@ -13,6 +13,10 @@ DATABASES = {
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
+MANAGERS = ADMINS
+
+# uncomment this for joomla integration support
+# DATABASE_ROUTERS = ['search.routers.Router']
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'something_very_secret'

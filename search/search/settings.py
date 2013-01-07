@@ -2,8 +2,6 @@ import os
 def next_to_root(*additional_paths):
     return os.path.realpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', *additional_paths))
 
-MANAGERS = ADMINS
-
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -98,7 +96,10 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
-    'saerch'
+    'search',
+    'south',
+    'web',
+    'joomla'
 )
 
 # A sample logging configuration. The only tangible logging
@@ -129,3 +130,5 @@ LOGGING = {
         },
     }
 }
+
+from localsettings import *
