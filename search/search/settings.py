@@ -99,7 +99,8 @@ INSTALLED_APPS = (
     'search',
     'south',
     'web',
-    'joomla'
+    'joomla',
+    'members'
 )
 
 # A sample logging configuration. The only tangible logging
