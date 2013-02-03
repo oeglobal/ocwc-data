@@ -19,7 +19,7 @@ def main():
                 contact = CivicrmContact.objects.get(id=org_id)
 
                 user = app.joomla_user
-                # print app.joomla_user, org_id, contact.display_name.encode('utf-8')
+                print app.joomla_user, org_id, contact.display_name.encode('utf-8')
                 user.block = 1
                 user.lastvisitdate = datetime.date(1900, 01, 01)
                 user.save()
