@@ -20,7 +20,7 @@ def main():
     #       feed.delete()
 
     for item in JosOcwCourses.objects.filter(crmid=crmid):
-        print item.title
+        print [item.title]
         if delete:
             item.delete()
 
