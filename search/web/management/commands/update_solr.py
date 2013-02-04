@@ -94,10 +94,11 @@ def make_lang():
                 doc.language = solr_lang.capitalize()
     #             doc.save()
 
+def is_member():
     for doc in JosOcwCourses.objects.all():
         status_id = doc.crmid.civicrmmembership_set.all()[0].status.id
         if status_id not in [2,3,5,7]:
-            doc.enabled = 0
+            doc.is_member = 0
             doc.save()
 
 def main():
@@ -123,6 +124,7 @@ def main():
                 'link': doc.linkurl,
                 'source': doc.source,
                 'language': solr_lang.title(),
+                'is_member': doc.is_member
             }
             solr.add(solr_doc)
             solr.commit()
@@ -148,7 +150,10 @@ class Command(BaseCommand):
                     dest='clear_solr'),
             make_option('--lang',
                     action='store',
-                    dest='make_lang')
+                    dest='make_lang'),
+            make_option('--members',
+                    action='store',
+                    dest='is_member')
         )
 
     def handle(self, *args, **options):
@@ -156,5 +161,7 @@ class Command(BaseCommand):
             clear_solr()
         elif options.get('make_lang'):
             make_lang()
+        elif options.get('is_member'):
+            is_member()
         else:
             main()

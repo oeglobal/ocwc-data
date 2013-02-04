@@ -3403,6 +3403,7 @@ class JosOcwCourses(models.Model):
     date_modified = models.DateTimeField(auto_now=True)
     locked = models.IntegerField(default=0)
     enabled = models.IntegerField()
+    is_member = models.IntegerField(default=1)
     class Meta:
         db_table = u'jos_ocw_courses'
 
