@@ -39,7 +39,7 @@ from django.db import models
 
 class CfGetorgs(models.Model):
     source = models.CharField(max_length=765)
-    crmid = models.IntegerField(unique=True)
+    crmid = models.IntegerField(unique=True, primary_key=True)
     url = models.CharField(max_length=765)
     language = models.CharField(max_length=765)
     last_indexed = models.DateTimeField(null=True, blank=True)
