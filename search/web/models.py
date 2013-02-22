@@ -36,3 +36,14 @@ class Course(models.Model):
     description = models.TextField(blank=True, null=True)
     retrieved = models.DateTimeField(auto_now_add=True)
     permalink = models.TextField()
+
+# class OcvbEntries(models.Model):
+#     start_time = models.DateTimeField(blank=True, null=True)
+#     title = models.CharField(max_length=255, blank=True, null=True)
+#     author = models.CharField(max_length=255, blank=True, null=True)
+#     author_url = models.CharField(max_length=255, blank=True, null=True)
+#     institution = models.CharField(max_length=255, blank=True, null=True)
+#     institution_url = models.CharField(max_length=255, blank=True, null=True)
+#     video_url = models.CharField(max_length=255, blank=True, null=True)
+#     language = models.CharField(max_length=255, blank=True, null=True)
+#     description = models.TextField(blank=True, null=True)
