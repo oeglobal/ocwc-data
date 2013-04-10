@@ -2684,104 +2684,109 @@ class CivicrmWorldregion(models.Model):
 #     class Meta:
 #         db_table = u'jos_docman_log'
 
-# class JosElectionBallotoptions(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     ballot_id = models.IntegerField()
-#     item_id = models.IntegerField()
-#     extra = models.CharField(max_length=765, blank=True)
-#     published = models.IntegerField()
-#     checked_out = models.IntegerField()
-#     checked_out_time = models.DateTimeField()
-#     ordering = models.IntegerField()
-#     class Meta:
-#         db_table = u'jos_election_ballotoptions'
+class JosElectionBallotoptions(models.Model):
+    id = models.IntegerField(primary_key=True)
+    ballot = models.ForeignKey('JosElectionBallots')
+    item = models.ForeignKey('JosElectionCandidates')
+    extra = models.CharField(max_length=765, blank=True)
+    published = models.IntegerField()
+    checked_out = models.IntegerField()
+    checked_out_time = models.DateTimeField()
+    ordering = models.IntegerField()
+    
+    class Meta:
+        db_table = u'jos_election_ballotoptions'
 
-# class JosElectionBallots(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     catid = models.IntegerField()
-#     type = models.CharField(max_length=765)
-#     title = models.CharField(max_length=765)
-#     intro = models.TextField()
-#     description = models.TextField()
-#     min_selections = models.IntegerField()
-#     max_selections = models.IntegerField()
-#     multiple = models.IntegerField()
-#     required_relationships = models.CharField(max_length=765)
-#     required_memberships = models.CharField(max_length=765)
-#     required_status = models.CharField(max_length=765)
-#     beginning = models.DateTimeField()
-#     ending = models.DateTimeField()
-#     date_added = models.DateTimeField()
-#     date_modified = models.DateTimeField()
-#     published = models.IntegerField()
-#     checked_out = models.IntegerField()
-#     checked_out_time = models.DateTimeField()
-#     class Meta:
-#         db_table = u'jos_election_ballots'
+    def __unicode__(self):
+        return '%s %s' % (self.item.crmid_candidate.first_name, self.item.crmid_candidate.last_name)
 
-# class JosElectionCandidates(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     crmid_candidate = models.IntegerField()
-#     crmid_institution = models.IntegerField()
-#     crmid_sponsor = models.IntegerField()
-#     bio = models.TextField(blank=True)
-#     vision = models.TextField(blank=True)
-#     link = models.CharField(max_length=765, blank=True)
-#     sponsor_comment = models.TextField(blank=True)
-#     alt_phone = models.CharField(max_length=45)
-#     alt_email = models.CharField(max_length=765)
-#     date_added = models.DateTimeField()
-#     date_modified = models.DateTimeField()
-#     election_year = models.IntegerField()
-#     vetted = models.IntegerField()
-#     published = models.IntegerField()
-#     checked_out = models.IntegerField()
-#     checked_out_time = models.DateTimeField()
-#     ordering = models.IntegerField()
-#     archived = models.IntegerField()
-#     accepted = models.IntegerField()
-#     declined = models.IntegerField()
-#     class Meta:
-#         db_table = u'jos_election_candidates'
+class JosElectionBallots(models.Model):
+    id = models.IntegerField(primary_key=True)
+    catid = models.IntegerField()
+    type = models.CharField(max_length=765)
+    title = models.CharField(max_length=765)
+    intro = models.TextField()
+    description = models.TextField()
+    min_selections = models.IntegerField()
+    max_selections = models.IntegerField()
+    multiple = models.IntegerField()
+    required_relationships = models.CharField(max_length=765)
+    required_memberships = models.CharField(max_length=765)
+    required_status = models.CharField(max_length=765)
+    beginning = models.DateTimeField()
+    ending = models.DateTimeField()
+    date_added = models.DateTimeField()
+    date_modified = models.DateTimeField()
+    published = models.IntegerField()
+    checked_out = models.IntegerField()
+    checked_out_time = models.DateTimeField()
+    class Meta:
+        db_table = u'jos_election_ballots'
 
-# class JosElectionMultipleVotes(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     orgid = models.IntegerField()
-#     orgname = models.CharField(max_length=765)
-#     vid = models.IntegerField()
-#     vname = models.CharField(max_length=765)
-#     members = models.IntegerField()
-#     votes = models.IntegerField()
-#     class Meta:
-#         db_table = u'jos_election_multiple_votes'
+class JosElectionCandidates(models.Model):
+    id = models.IntegerField(primary_key=True)
+    # crmid_candidate = models.IntegerField()
+    crmid_candidate = models.ForeignKey(CivicrmContact, db_column='crmid_candidate')
+    crmid_institution = models.IntegerField()
+    crmid_sponsor = models.IntegerField()
+    bio = models.TextField(blank=True)
+    vision = models.TextField(blank=True)
+    link = models.CharField(max_length=765, blank=True)
+    sponsor_comment = models.TextField(blank=True)
+    alt_phone = models.CharField(max_length=45)
+    alt_email = models.CharField(max_length=765)
+    date_added = models.DateTimeField()
+    date_modified = models.DateTimeField()
+    election_year = models.IntegerField()
+    vetted = models.IntegerField()
+    published = models.IntegerField()
+    checked_out = models.IntegerField()
+    checked_out_time = models.DateTimeField()
+    ordering = models.IntegerField()
+    archived = models.IntegerField()
+    accepted = models.IntegerField()
+    declined = models.IntegerField()
+    class Meta:
+        db_table = u'jos_election_candidates'
 
-# class JosElectionPropositions(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     title = models.CharField(max_length=765)
-#     details = models.TextField()
-#     intro = models.TextField()
-#     date_added = models.DateTimeField()
-#     date_modified = models.DateTimeField()
-#     published = models.IntegerField()
-#     checked_out = models.IntegerField()
-#     checked_out_time = models.DateTimeField()
-#     ordering = models.IntegerField()
-#     class Meta:
-#         db_table = u'jos_election_propositions'
+class JosElectionMultipleVotes(models.Model):
+    id = models.IntegerField(primary_key=True)
+    orgid = models.IntegerField()
+    orgname = models.CharField(max_length=765)
+    vid = models.IntegerField()
+    vname = models.CharField(max_length=765)
+    members = models.IntegerField()
+    votes = models.IntegerField()
+    class Meta:
+        db_table = u'jos_election_multiple_votes'
 
-# class JosElectionVotes(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     ballotoption_id = models.IntegerField()
-#     user_id = models.IntegerField()
-#     crm_id = models.IntegerField()
-#     org_id = models.IntegerField()
-#     date_submitted = models.DateTimeField()
-#     published = models.IntegerField()
-#     checked_out = models.IntegerField()
-#     checked_out_time = models.DateTimeField()
-#     ordering = models.IntegerField()
-#     class Meta:
-#         db_table = u'jos_election_votes'
+class JosElectionPropositions(models.Model):
+    id = models.IntegerField(primary_key=True)
+    title = models.CharField(max_length=765)
+    details = models.TextField()
+    intro = models.TextField()
+    date_added = models.DateTimeField()
+    date_modified = models.DateTimeField()
+    published = models.IntegerField()
+    checked_out = models.IntegerField()
+    checked_out_time = models.DateTimeField()
+    ordering = models.IntegerField()
+    class Meta:
+        db_table = u'jos_election_propositions'
+
+class JosElectionVotes(models.Model):
+    id = models.IntegerField(primary_key=True)
+    ballotoption = models.ForeignKey(JosElectionBallotoptions)
+    user_id = models.IntegerField()
+    crm_id = models.ForeignKey(CivicrmContact, db_column='crm_id')
+    org_id = models.IntegerField()
+    date_submitted = models.DateTimeField()
+    published = models.IntegerField()
+    checked_out = models.IntegerField()
+    checked_out_time = models.DateTimeField()
+    ordering = models.IntegerField()
+    class Meta:
+        db_table = u'jos_election_votes'
 
 # class JosExportCategories(models.Model):
 #     id = models.IntegerField(primary_key=True)
