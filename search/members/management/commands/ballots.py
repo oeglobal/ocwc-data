@@ -10,7 +10,6 @@ def main():
 		ballot = JosElectionBallots.objects.get(pk=bid)
 		
 		# print dir(ballot)
-
 		voters = []
 		for boption in ballot.joselectionballotoptions_set.all():
 			# print unicode(boption), boption.joselectionvotes_set.count()
@@ -19,7 +18,7 @@ def main():
 				crmid = int(vote.crm_id.id)
 				if crmid not in voters:
 					voters.append(crmid)
-					print crmid, vote.crm_id.first_name, vote.crm_id.last_name
+					# print crmid, vote.crm_id.first_name, vote.crm_id.last_name
 
 		# print sorted(voters)
 		print ballot.title, len(voters)
