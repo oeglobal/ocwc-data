@@ -8,7 +8,7 @@ def main():
 
 	for bid in ballots_ids:
 		ballot = JosElectionBallots.objects.get(pk=bid)
-		print ballot.title
+		
 		# print dir(ballot)
 
 		voters = []
@@ -21,8 +21,8 @@ def main():
 					voters.append(crmid)
 					print crmid, vote.crm_id.first_name, vote.crm_id.last_name
 
-		print sorted(voters)
-
+		# print sorted(voters)
+		print ballot.title, len(voters)
 
 
 class Command(BaseCommand):
