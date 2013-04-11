@@ -18,7 +18,8 @@ def main():
 				crmid = int(vote.crm_id.id)
 				if crmid not in voters:
 					voters.append(crmid)
-					print crmid, vote.crm_id.first_name, vote.crm_id.last_name.encode('utf-8')
+					# print crmid, 
+					print vote.crm_id.first_name, vote.crm_id.last_name.encode('utf-8')
 
 		# print sorted(voters)
 		print ballot.title, len(voters)
