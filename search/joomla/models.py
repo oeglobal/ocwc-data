@@ -830,199 +830,219 @@ class CivicrmEmail(models.Model):
 #     class Meta:
 #         db_table = u'civicrm_log'
 
-# class CivicrmMailSettings(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     domain_id = models.IntegerField()
-#     name = models.CharField(max_length=765, blank=True)
-#     is_default = models.IntegerField(null=True, blank=True)
-#     domain = models.CharField(max_length=765, blank=True)
-#     localpart = models.CharField(max_length=765, blank=True)
-#     return_path = models.CharField(max_length=765, blank=True)
-#     protocol = models.CharField(max_length=765, blank=True)
-#     server = models.CharField(max_length=765, blank=True)
-#     port = models.IntegerField(null=True, blank=True)
-#     username = models.CharField(max_length=765, blank=True)
-#     password = models.CharField(max_length=765, blank=True)
-#     is_ssl = models.IntegerField(null=True, blank=True)
-#     source = models.CharField(max_length=765, blank=True)
-#     class Meta:
-#         db_table = u'civicrm_mail_settings'
+class CivicrmMailSettings(models.Model):
+    id = models.IntegerField(primary_key=True)
+    domain_id = models.IntegerField()
+    name = models.CharField(max_length=765, blank=True)
+    is_default = models.IntegerField(null=True, blank=True)
+    domain = models.CharField(max_length=765, blank=True)
+    localpart = models.CharField(max_length=765, blank=True)
+    return_path = models.CharField(max_length=765, blank=True)
+    protocol = models.CharField(max_length=765, blank=True)
+    server = models.CharField(max_length=765, blank=True)
+    port = models.IntegerField(null=True, blank=True)
+    username = models.CharField(max_length=765, blank=True)
+    password = models.CharField(max_length=765, blank=True)
+    is_ssl = models.IntegerField(null=True, blank=True)
+    source = models.CharField(max_length=765, blank=True)
+    class Meta:
+        db_table = u'civicrm_mail_settings'
 
-# class CivicrmMailing(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     header = models.ForeignKey(CivicrmMailingComponent, null=True, blank=True)
-#     footer = models.ForeignKey(CivicrmMailingComponent, null=True, blank=True)
-#     reply = models.ForeignKey(CivicrmMailingComponent, null=True, blank=True)
-#     unsubscribe = models.ForeignKey(CivicrmMailingComponent, null=True, blank=True)
-#     resubscribe_id = models.IntegerField(null=True, blank=True)
-#     optout = models.ForeignKey(CivicrmMailingComponent, null=True, blank=True)
-#     name = models.CharField(max_length=384, blank=True)
-#     from_name = models.CharField(max_length=384, blank=True)
-#     from_email = models.CharField(max_length=384, blank=True)
-#     replyto_email = models.CharField(max_length=384, blank=True)
-#     subject = models.CharField(max_length=384, blank=True)
-#     body_text = models.TextField(blank=True)
-#     body_html = models.TextField(blank=True)
-#     url_tracking = models.IntegerField(null=True, blank=True)
-#     forward_replies = models.IntegerField(null=True, blank=True)
-#     auto_responder = models.IntegerField(null=True, blank=True)
-#     open_tracking = models.IntegerField(null=True, blank=True)
-#     is_completed = models.IntegerField(null=True, blank=True)
-#     msg_template = models.ForeignKey(CivicrmMsgTemplate, null=True, blank=True)
-#     override_verp = models.IntegerField(null=True, blank=True)
-#     created = models.ForeignKey(CivicrmContact, null=True, blank=True)
-#     created_date = models.DateTimeField(null=True, blank=True)
-#     scheduled = models.ForeignKey(CivicrmContact, null=True, blank=True)
-#     is_archived = models.IntegerField(null=True, blank=True)
-#     class Meta:
-#         db_table = u'civicrm_mailing'
+class CivicrmMailing(models.Model):
+    id = models.IntegerField(primary_key=True)
+    domain = models.ForeignKey(CivicrmDomain, null=True, blank=True)
+    header = models.ForeignKey(CivicrmMailingComponent, null=True, blank=True)
+    footer = models.ForeignKey(CivicrmMailingComponent, null=True, blank=True)
+    reply = models.ForeignKey(CivicrmMailingComponent, null=True, blank=True)
+    unsubscribe = models.ForeignKey(CivicrmMailingComponent, null=True, blank=True)
+    resubscribe_id = models.IntegerField(null=True, blank=True)
+    optout = models.ForeignKey(CivicrmMailingComponent, null=True, blank=True)
+    name = models.CharField(max_length=384, blank=True)
+    from_name = models.CharField(max_length=384, blank=True)
+    from_email = models.CharField(max_length=384, blank=True)
+    replyto_email = models.CharField(max_length=384, blank=True)
+    subject = models.CharField(max_length=384, blank=True)
+    body_text = models.TextField(blank=True)
+    body_html = models.TextField(blank=True)
+    url_tracking = models.IntegerField(null=True, blank=True)
+    forward_replies = models.IntegerField(null=True, blank=True)
+    auto_responder = models.IntegerField(null=True, blank=True)
+    open_tracking = models.IntegerField(null=True, blank=True)
+    is_completed = models.IntegerField(null=True, blank=True)
+    msg_template = models.ForeignKey(CivicrmMsgTemplate, null=True, blank=True)
+    override_verp = models.IntegerField(null=True, blank=True)
+    created = models.ForeignKey(CivicrmContact, null=True, blank=True)
+    created_date = models.DateTimeField(null=True, blank=True)
+    scheduled = models.ForeignKey(CivicrmContact, null=True, blank=True)
+    is_archived = models.IntegerField(null=True, blank=True)
+    scheduled_date = models.DateTimeField(null=True, blank=True)
+    approver = models.ForeignKey(CivicrmContact, null=True, blank=True)
+    approval_date = models.DateTimeField(null=True, blank=True)
+    approval_status_id = models.IntegerField(null=True, blank=True)
+    approval_note = models.TextField(blank=True)
+    visibility = models.CharField(max_length=72, blank=True)
+    campaign = models.ForeignKey(CivicrmCampaign, null=True, blank=True)
+    class Meta:
+        db_table = u'civicrm_mailing'
 
-# class CivicrmMailingBouncePattern(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     bounce_type = models.ForeignKey(CivicrmMailingBounceType)
-#     pattern = models.CharField(max_length=765, blank=True)
-#     class Meta:
-#         db_table = u'civicrm_mailing_bounce_pattern'
+class CivicrmMailingBouncePattern(models.Model):
+    id = models.IntegerField(primary_key=True)
+    bounce_type = models.ForeignKey(CivicrmMailingBounceType)
+    pattern = models.CharField(max_length=765, blank=True)
+    class Meta:
+        db_table = u'civicrm_mailing_bounce_pattern'
 
-# class CivicrmMailingBounceType(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     name = models.CharField(max_length=24)
-#     description = models.CharField(max_length=765, blank=True)
-#     hold_threshold = models.IntegerField()
-#     class Meta:
-#         db_table = u'civicrm_mailing_bounce_type'
+class CivicrmMailingBounceType(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=24)
+    description = models.CharField(max_length=765, blank=True)
+    hold_threshold = models.IntegerField()
+    class Meta:
+        db_table = u'civicrm_mailing_bounce_type'
 
-# class CivicrmMailingComponent(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     name = models.CharField(max_length=192, blank=True)
-#     component_type = models.CharField(max_length=33, blank=True)
-#     subject = models.CharField(max_length=765, blank=True)
-#     body_html = models.TextField(blank=True)
-#     body_text = models.TextField(blank=True)
-#     is_default = models.IntegerField(null=True, blank=True)
-#     is_active = models.IntegerField(null=True, blank=True)
-#     class Meta:
-#         db_table = u'civicrm_mailing_component'
+class CivicrmMailingComponent(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=192, blank=True)
+    component_type = models.CharField(max_length=33, blank=True)
+    subject = models.CharField(max_length=765, blank=True)
+    body_html = models.TextField(blank=True)
+    body_text = models.TextField(blank=True)
+    is_default = models.IntegerField(null=True, blank=True)
+    is_active = models.IntegerField(null=True, blank=True)
+    class Meta:
+        db_table = u'civicrm_mailing_component'
 
-# class CivicrmMailingEventBounce(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     event_queue = models.ForeignKey(CivicrmMailingEventQueue)
-#     bounce_type_id = models.IntegerField(null=True, blank=True)
-#     bounce_reason = models.CharField(max_length=765, blank=True)
-#     time_stamp = models.DateTimeField()
-#     class Meta:
-#         db_table = u'civicrm_mailing_event_bounce'
+class CivicrmMailingEventBounce(models.Model):
+    id = models.IntegerField(primary_key=True)
+    event_queue = models.ForeignKey(CivicrmMailingEventQueue)
+    bounce_type_id = models.IntegerField(null=True, blank=True)
+    bounce_reason = models.CharField(max_length=765, blank=True)
+    time_stamp = models.DateTimeField()
+    class Meta:
+        db_table = u'civicrm_mailing_event_bounce'
 
-# class CivicrmMailingEventConfirm(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     event_subscribe = models.ForeignKey(CivicrmMailingEventSubscribe)
-#     time_stamp = models.DateTimeField()
-#     class Meta:
-#         db_table = u'civicrm_mailing_event_confirm'
+class CivicrmMailingEventConfirm(models.Model):
+    id = models.IntegerField(primary_key=True)
+    event_subscribe = models.ForeignKey(CivicrmMailingEventSubscribe)
+    time_stamp = models.DateTimeField()
+    class Meta:
+        db_table = u'civicrm_mailing_event_confirm'
 
-# class CivicrmMailingEventDelivered(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     event_queue = models.ForeignKey(CivicrmMailingEventQueue)
-#     time_stamp = models.DateTimeField()
-#     class Meta:
-#         db_table = u'civicrm_mailing_event_delivered'
+class CivicrmMailingEventDelivered(models.Model):
+    id = models.IntegerField(primary_key=True)
+    event_queue = models.ForeignKey(CivicrmMailingEventQueue)
+    time_stamp = models.DateTimeField()
+    class Meta:
+        db_table = u'civicrm_mailing_event_delivered'
 
-# class CivicrmMailingEventForward(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     event_queue = models.ForeignKey(CivicrmMailingEventQueue)
-#     dest_queue = models.ForeignKey(CivicrmMailingEventQueue, null=True, blank=True)
-#     time_stamp = models.DateTimeField()
-#     class Meta:
-#         db_table = u'civicrm_mailing_event_forward'
+class CivicrmMailingEventForward(models.Model):
+    id = models.IntegerField(primary_key=True)
+    event_queue = models.ForeignKey(CivicrmMailingEventQueue)
+    dest_queue = models.ForeignKey(CivicrmMailingEventQueue, null=True, blank=True)
+    time_stamp = models.DateTimeField()
+    class Meta:
+        db_table = u'civicrm_mailing_event_forward'
 
-# class CivicrmMailingEventOpened(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     event_queue = models.ForeignKey(CivicrmMailingEventQueue)
-#     time_stamp = models.DateTimeField()
-#     class Meta:
-#         db_table = u'civicrm_mailing_event_opened'
+class CivicrmMailingEventOpened(models.Model):
+    id = models.IntegerField(primary_key=True)
+    event_queue = models.ForeignKey(CivicrmMailingEventQueue)
+    time_stamp = models.DateTimeField()
+    class Meta:
+        db_table = u'civicrm_mailing_event_opened'
 
-# class CivicrmMailingEventQueue(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     job = models.ForeignKey(CivicrmMailingJob)
-#     email = models.ForeignKey(CivicrmEmail)
-#     contact = models.ForeignKey(CivicrmContact)
-#     hash = models.CharField(max_length=765)
-#     class Meta:
-#         db_table = u'civicrm_mailing_event_queue'
+class CivicrmMailingEventQueue(models.Model):
+    id = models.IntegerField(primary_key=True)
+    job = models.ForeignKey(CivicrmMailingJob)
+    email = models.ForeignKey(CivicrmEmail)
+    contact = models.ForeignKey(CivicrmContact)
+    hash = models.CharField(max_length=765)
+    class Meta:
+        db_table = u'civicrm_mailing_event_queue'
 
-# class CivicrmMailingEventReply(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     event_queue = models.ForeignKey(CivicrmMailingEventQueue)
-#     time_stamp = models.DateTimeField()
-#     class Meta:
-#         db_table = u'civicrm_mailing_event_reply'
+class CivicrmMailingEventReply(models.Model):
+    id = models.IntegerField(primary_key=True)
+    event_queue = models.ForeignKey(CivicrmMailingEventQueue)
+    time_stamp = models.DateTimeField()
+    class Meta:
+        db_table = u'civicrm_mailing_event_reply'
 
-# class CivicrmMailingEventSubscribe(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     group = models.ForeignKey(CivicrmGroup)
-#     contact = models.ForeignKey(CivicrmContact)
-#     hash = models.CharField(max_length=765)
-#     time_stamp = models.DateTimeField()
-#     class Meta:
-#         db_table = u'civicrm_mailing_event_subscribe'
+class CivicrmMailingEventSubscribe(models.Model):
+    id = models.IntegerField(primary_key=True)
+    group = models.ForeignKey(CivicrmGroup)
+    contact = models.ForeignKey(CivicrmContact)
+    hash = models.CharField(max_length=765)
+    time_stamp = models.DateTimeField()
+    class Meta:
+        db_table = u'civicrm_mailing_event_subscribe'
 
-# class CivicrmMailingEventTrackableUrlOpen(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     event_queue = models.ForeignKey(CivicrmMailingEventQueue)
-#     trackable_url = models.ForeignKey(CivicrmMailingTrackableUrl)
-#     time_stamp = models.DateTimeField()
-#     class Meta:
-#         db_table = u'civicrm_mailing_event_trackable_url_open'
+class CivicrmMailingEventTrackableUrlOpen(models.Model):
+    id = models.IntegerField(primary_key=True)
+    event_queue = models.ForeignKey(CivicrmMailingEventQueue)
+    trackable_url = models.ForeignKey(CivicrmMailingTrackableUrl)
+    time_stamp = models.DateTimeField()
+    class Meta:
+        db_table = u'civicrm_mailing_event_trackable_url_open'
 
-# class CivicrmMailingEventUnsubscribe(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     event_queue = models.ForeignKey(CivicrmMailingEventQueue)
-#     org_unsubscribe = models.IntegerField()
-#     time_stamp = models.DateTimeField()
-#     class Meta:
-#         db_table = u'civicrm_mailing_event_unsubscribe'
+class CivicrmMailingEventUnsubscribe(models.Model):
+    id = models.IntegerField(primary_key=True)
+    event_queue = models.ForeignKey(CivicrmMailingEventQueue)
+    org_unsubscribe = models.IntegerField()
+    time_stamp = models.DateTimeField()
+    class Meta:
+        db_table = u'civicrm_mailing_event_unsubscribe'
 
-# class CivicrmMailingGroup(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     mailing = models.ForeignKey(CivicrmMailing)
-#     group_type = models.CharField(max_length=21, blank=True)
-#     entity_table = models.CharField(max_length=192)
-#     entity_id = models.IntegerField()
-#     search_id = models.IntegerField(null=True, blank=True)
-#     search_args = models.TextField(blank=True)
-#     class Meta:
-#         db_table = u'civicrm_mailing_group'
+class CivicrmMailingGroup(models.Model):
+    id = models.IntegerField(primary_key=True)
+    mailing = models.ForeignKey(CivicrmMailing)
+    group_type = models.CharField(max_length=21, blank=True)
+    entity_table = models.CharField(max_length=192)
+    entity_id = models.IntegerField()
+    search_id = models.IntegerField(null=True, blank=True)
+    search_args = models.TextField(blank=True)
+    class Meta:
+        db_table = u'civicrm_mailing_group'
 
-# class CivicrmMailingJob(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     mailing = models.ForeignKey(CivicrmMailing)
-#     scheduled_date = models.DateTimeField(null=True, blank=True)
-#     start_date = models.DateTimeField(null=True, blank=True)
-#     end_date = models.DateTimeField(null=True, blank=True)
-#     status = models.CharField(max_length=27, blank=True)
-#     is_test = models.IntegerField(null=True, blank=True)
-#     class Meta:
-#         db_table = u'civicrm_mailing_job'
+class CivicrmMailingJob(models.Model):
+    id = models.IntegerField(primary_key=True)
+    mailing = models.ForeignKey(CivicrmMailing)
+    scheduled_date = models.DateTimeField(null=True, blank=True)
+    start_date = models.DateTimeField(null=True, blank=True)
+    end_date = models.DateTimeField(null=True, blank=True)
+    status = models.CharField(max_length=27, blank=True)
+    is_test = models.IntegerField(null=True, blank=True)
+    job_type = models.CharField(max_length=765, blank=True)
+    parent = models.ForeignKey('self', null=True, blank=True)
+    job_offset = models.IntegerField(null=True, blank=True)
+    job_limit = models.IntegerField(null=True, blank=True)
+    class Meta:
+        db_table = u'civicrm_mailing_job'
 
-# class CivicrmMailingSpool(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     job = models.ForeignKey(CivicrmMailingJob)
-#     recipient_email = models.TextField(blank=True)
-#     headers = models.TextField(blank=True)
-#     body = models.TextField(blank=True)
-#     added_at = models.DateTimeField(null=True, blank=True)
-#     removed_at = models.DateTimeField(null=True, blank=True)
-#     class Meta:
-#         db_table = u'civicrm_mailing_spool'
+class CivicrmMailingRecipients(models.Model):
+    id = models.IntegerField(primary_key=True)
+    mailing = models.ForeignKey(CivicrmMailing)
+    contact = models.ForeignKey(CivicrmContact)
+    email = models.ForeignKey(CivicrmEmail)
+    class Meta:
+        db_table = u'civicrm_mailing_recipients'
 
-# class CivicrmMailingTrackableUrl(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     url = models.CharField(max_length=765)
-#     mailing = models.ForeignKey(CivicrmMailing)
-#     class Meta:
-#         db_table = u'civicrm_mailing_trackable_url'
+class CivicrmMailingSpool(models.Model):
+    id = models.IntegerField(primary_key=True)
+    job = models.ForeignKey(CivicrmMailingJob)
+    recipient_email = models.TextField(blank=True)
+    headers = models.TextField(blank=True)
+    body = models.TextField(blank=True)
+    added_at = models.DateTimeField(null=True, blank=True)
+    removed_at = models.DateTimeField(null=True, blank=True)
+    class Meta:
+        db_table = u'civicrm_mailing_spool'
 
+class CivicrmMailingTrackableUrl(models.Model):
+    id = models.IntegerField(primary_key=True)
+    url = models.CharField(max_length=765)
+    mailing = models.ForeignKey(CivicrmMailing)
+    class Meta:
+        db_table = u'civicrm_mailing_trackable_url'
+        
 # class CivicrmMapping(models.Model):
 #     id = models.IntegerField(primary_key=True)
 #     name = models.CharField(max_length=192, blank=True)
@@ -1776,15 +1796,16 @@ class CivicrmStateProvince(models.Model):
 #     class Meta:
 #         db_table = u'civicrm_uf_join'
 
-# class CivicrmUfMatch(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     domain = models.ForeignKey(CivicrmDomain)
-#     uf_id = models.IntegerField()
-#     uf_name = models.CharField(max_length=384, unique=True, blank=True)
-#     contact = models.ForeignKey(CivicrmContact, unique=True, null=True, blank=True)
-#     language = models.CharField(max_length=15, blank=True)
-#     class Meta:
-#         db_table = u'civicrm_uf_match'
+class CivicrmUfMatch(models.Model):
+    id = models.IntegerField(primary_key=True)
+    domain = models.ForeignKey(CivicrmDomain)
+    # uf_id = models.IntegerField()
+    uf_id = models.ForeignKey('JosUsers', db_column='uf_id') 
+    uf_name = models.CharField(max_length=384, unique=True, blank=True)
+    contact = models.ForeignKey(CivicrmContact, unique=True, null=True, blank=True)
+    language = models.CharField(max_length=15, blank=True)
+    class Meta:
+        db_table = u'civicrm_uf_match'
 
 # class CivicrmValue1AffiliateApplicationQuestions4(models.Model):
 #     id = models.IntegerField(primary_key=True)
@@ -3408,7 +3429,7 @@ class JosOcwCourses(models.Model):
     date_modified = models.DateTimeField(auto_now=True)
     locked = models.IntegerField(default=0)
     enabled = models.IntegerField()
-    is_member = models.IntegerField(default=1)
+    # is_member = models.IntegerField(default=1)
     class Meta:
         db_table = u'jos_ocw_courses'
 
@@ -3524,13 +3545,21 @@ class JosOcwCourses(models.Model):
 #     class Meta:
 #         db_table = u'jos_templates_menu'
 
+USER_TYPE_CHOICES = (
+    ('Administrator', 'Administrator'),
+    ('Manager', 'Manager'),
+    ('Registered', 'Registered'),
+    ('Super Administrator', 'Super Administrator'),
+    ('', 'Empty')
+)
+
 class JosUsers(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=765)
     username = models.CharField(max_length=450)
     email = models.CharField(max_length=300)
     password = models.CharField(max_length=300)
-    usertype = models.CharField(max_length=75)
+    usertype = models.CharField(max_length=75, choices=USER_TYPE_CHOICES)
     block = models.IntegerField()
     sendemail = models.IntegerField(null=True, db_column='sendEmail', blank=True) # Field name made lowercase.
     gid = models.IntegerField()
