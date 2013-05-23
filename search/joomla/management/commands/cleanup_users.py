@@ -11,8 +11,13 @@ def main():
         # check for inactivity
         # check for civicrm relations
 
+
+    # you should also catch the 0000-00-00 00:00 last visited users since they are spam
+    # anyway
     qs = JosUsers.objects.filter(
-        Q(lastvisitdate=None) | Q(lastvisitdate__lt=(datetime.datetime.now() - datetime.timedelta(days=60))),
+        Q(lastvisitdate=None) | 
+        Q(lastvisitdate__lt=(datetime.datetime.now() - datetime.timedelta(days=10))), #|
+        # Q(lastvisitdate_char='0000-00-00 00:00:00')    ),
         usertype__in=['Registered', '']
     )
 
@@ -20,6 +25,18 @@ def main():
 
     rel_count = 0
     mailing_count = 0
+
+    for app in JosMemberApplications.objects.filter(app_status='Spam'):
+        # check for border conditions - multiple applications, some spam some not
+        # remove only if all apps are marked as spam, warn otherwise
+        user_id = app.joomla_user_id
+        try:
+            JosUsers.objects.get(id=user_id).delete()
+        except JosUsers.DoesNotExist:
+            pass
+
+        app.delete()
+
     for user in qs:
         # print dir(user)
         if user.civicrmufmatch_set.count():
