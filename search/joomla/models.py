@@ -38,12 +38,14 @@ from django.db import models
 #         db_table = u'ajax_chat_online'
 
 class CfGetorgs(models.Model):
+    # ALTER TABLE cf_getorgs ADD id INT PRIMARY KEY AUTO_INCREMENT;
+    id = models.IntegerField(primary_key=True)
     source = models.CharField(max_length=765)
     crmid = models.IntegerField(unique=True, primary_key=True)
     url = models.CharField(max_length=765)
     language = models.CharField(max_length=765)
     last_indexed = models.DateTimeField(null=True, blank=True)
-    executed = models.IntegerField()
+    executed = models.IntegerField(default=0)
     class Meta:
         db_table = u'cf_getorgs'
 
