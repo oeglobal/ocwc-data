@@ -41,7 +41,7 @@ class CfGetorgs(models.Model):
     # ALTER TABLE cf_getorgs ADD id INT PRIMARY KEY AUTO_INCREMENT;
     id = models.IntegerField(primary_key=True)
     source = models.CharField(max_length=765)
-    crmid = models.IntegerField(unique=True, primary_key=True)
+    crmid = models.IntegerField(unique=True)
     url = models.CharField(max_length=765)
     language = models.CharField(max_length=765)
     last_indexed = models.DateTimeField(null=True, blank=True)
@@ -1803,7 +1803,7 @@ class CivicrmUfMatch(models.Model):
     domain = models.ForeignKey(CivicrmDomain)
     # uf_id = models.IntegerField()
     uf_id = models.ForeignKey('JosUsers', db_column='uf_id') 
-    uf_name = models.CharField(max_length=384, unique=True, blank=True)
+    uf_name = models.TextField(max_length=384, unique=True, blank=True)
     contact = models.ForeignKey(CivicrmContact, unique=True, null=True, blank=True)
     language = models.CharField(max_length=15, blank=True)
     class Meta:
@@ -1896,7 +1896,7 @@ class CivicrmValue1InstitutionInformation(models.Model):
 
 class CivicrmWorldregion(models.Model):
     id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=384, blank=True)
+    name = models.TextField(max_length=384, blank=True)
     class Meta:
         db_table = u'civicrm_worldregion'
 
