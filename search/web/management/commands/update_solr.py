@@ -45,6 +45,7 @@ LANG_MAPPING = {
     'German': 'german',
     'Korean': 'korean',
     'Malay': 'malay',
+    'Finnish': 'finnish'
 }
 
 def clear_solr():
@@ -124,7 +125,7 @@ def main():
                 'link': doc.linkurl,
                 'source': doc.source,
                 'language': solr_lang.title(),
-                'is_member': doc.is_member
+                'is_member': True #doc.is_member
             }
             solr.add(solr_doc)
             solr.commit()
