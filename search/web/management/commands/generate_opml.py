@@ -11,8 +11,7 @@ from web.models import *
 def main():
 	f = open(os.path.join(settings.JOOMLA_PATH,'feeds/ocwcmemberfeeds.opml'),'w')
 
-	f.write('''<?xml version="1.0" encoding="utf-8"?>
-<opml xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	f.write('''<?xml version="1.0"?><rss version="2.0" xmlns:opml="http://opml.org/spec2">
 	<head>
 		<title>OpenCourseWare Consortium Member Course Feeds</title>
 		 <dateCreated>%s</dateCreated>
@@ -23,7 +22,7 @@ def main():
 
 	for feed in CfGetorgs.objects.filter(executed=0):
 		f.write(u'''
-			<outline type="rss"  title="{feed.source}" text="{feed.source}" url="{feed.url}"/>'''.format(feed=feed).encode('utf-8'))
+			<outline type="rss"  title="{feed.source}" text="{feed.source}" xmlUrl="{feed.url}"/>'''.format(feed=feed).encode('utf-8'))
 	f.write('\n</body>\n</opml>')
 	f.close()
 
