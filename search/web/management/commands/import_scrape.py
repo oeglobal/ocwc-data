@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.core.management.base import BaseCommand
-
+from django.conf import settings
 from web.models import *
 from joomla.models import *
 
@@ -8,23 +8,31 @@ import json
 import os
 import hashlib
 
-def main():
+def main(crmid=None):
     m = hashlib.md5()
-    filename_list = ['scraped/693.json',]
+    
+    if crmid:
+        filename_list = ['scraped/%s.json' % crmid]
+    else:
+        filename_list = ['scraped/'+str(x) for x in os.listdir('scraped')]
 
     for f in filename_list:
         path, filename = os.path.split(f)
         crmid = filename.split('.')[0]
 
+        print "Importing", crmid, path, filename
+        JosOcwCourses.objects.filter(crmid=crmid).delete()
+
         contact = CivicrmContact.objects.get(pk=crmid)
 
-        data = json.loads(open(f).read())
-        for entry in data:
+        raw_data = open(f).readlines()
+        for raw_entry in raw_data:
+            entry = json.loads(raw_entry)
             link = entry.get('url')
             m.update(link)
             linkhash = m.hexdigest()
 
-            JosOcwCourses.objects.get_or_create(
+            JosOcwCourses.objects.create(
                 crmid_id = crmid,
                 linkhash = linkhash,
                 linkurl = link,
@@ -38,7 +46,12 @@ def main():
 
 
 class Command(BaseCommand):
+    args = "<crmid>"
     help = "imports scraped .json into main database - takes json filename as argument"
 
     def handle(self, *args, **options):
-        main()
+        if args:
+            for crmid in args:
+                main(crmid)
+        else:
+            main()
