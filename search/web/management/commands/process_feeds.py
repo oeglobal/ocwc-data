@@ -32,15 +32,19 @@ def main():
                     m.update(entry.link)
                     linkhash = m.hexdigest()
 
-                    JosOcwCourses.objects.get_or_create(
+                    course, created = JosOcwCourses.objects.get_or_create(
                         crmid_id = feed.crmid,
                         linkhash = linkhash,
-                        linkurl = entry.link,
-                        title = entry.get('title'),
-                        description = entry.get('description', ''),
-                        source = feed.source,
-                        language = feed.language,
+                        linkurl = entry.link
+                        defaults={
+                            'title': entry.get('title'),
+                            'description': entry.get('description', ''),
+                            'source': feed.source,
+                            'language': feed.language,
+                            'enabled': True
+                        }
                     )
+
             elif entry.get('rdf_li'):
                 link = entry.id
                 m.update(link)
@@ -67,21 +71,6 @@ def main():
                         'enabled': True,
                     }
                 )
-
-
-            # course = Course.objects.get_or_create(
-            #     source=feed, 
-            #     permalink=entry.link,
-            #     defaults={
-            #         'title':entry.title,
-            #         'description': entry.get('description')
-            #     })
-
-        
-        # if naive: continue
-        # print d.namespaces
-
-        # no alternative approcahes for now
 
             
 
