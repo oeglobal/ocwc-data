@@ -64,7 +64,7 @@ def main():
                         'date_indexed': entry.updated_parsed,
                         'date_modified': entry.updated_parsed,
                         'locked': 0,
-                        'enabled': 1,
+                        'enabled': True,
                     }
                 )
 

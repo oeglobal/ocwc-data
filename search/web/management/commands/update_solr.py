@@ -45,7 +45,8 @@ LANG_MAPPING = {
     'German': 'german',
     'Korean': 'korean',
     'Malay': 'malay',
-    'Finnish': 'finnish'
+    'Finnish': 'finnish',
+    'Turkish': 'turkish',
 }
 
 def clear_solr():
@@ -75,7 +76,7 @@ def make_lang():
     for lang in LANG_MAPPING:
         solr_lang = LANG_MAPPING[lang]
         # print solr_lang
-        for doc in JosOcwCourses.objects.filter(language=lang, enabled=True):
+        for doc in JosOcwCourses.objects.filter(language=lang):
             if solr_lang in ['english',]: 
                 topLanguageName, topLanguageCode, isReliable, textBytesFound, details = cld.detect(doc.title.encode('utf-8') + " " + doc.description.encode('utf-8'))
                 if topLanguageCode not in  ['en','un']:
@@ -83,17 +84,21 @@ def make_lang():
                     if topLanguageCode == 'un':
                         topLanguageName = 'English'
 
-                    doc.language = topLanguageName.lower().capitalize()
+                    language = topLanguageName.lower().capitalize()
+                    if language in LANG_MAPPING:
+                        doc.language = language
 
-                    print topLanguageName, topLanguageCode, isReliable
-                    print doc.title, doc.description
-                    doc.save()
-                    continue
+                        print topLanguageName, topLanguageCode, isReliable
+                        print doc.title, doc.description
+                        doc.save()
+                        continue
+                    else:
+                        print "new language", topLanguageName, topLanguageCode, isReliable
 
             if doc.language != solr_lang.capitalize():
                 print doc.language, '-->', solr_lang.capitalize()
                 doc.language = solr_lang.capitalize()
-    #             doc.save()
+                doc.save()
 
 def is_member():
     for doc in JosOcwCourses.objects.all():

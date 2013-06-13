@@ -38,6 +38,7 @@ def main(crmid=None):
                 linkurl = link,
                 title = ''.join(entry.get('title','')),
                 description = entry.get('description', ''), #.replace('\r\n', '<br />'),
+                tags = ', '.join(entry.get('categories','')),
                 source = contact.legal_name,
                 author = ','.join(entry.get('author')),
                 language = 'English',
