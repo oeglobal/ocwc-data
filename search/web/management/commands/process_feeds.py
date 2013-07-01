@@ -35,7 +35,7 @@ def main():
                     course, created = JosOcwCourses.objects.get_or_create(
                         crmid_id = feed.crmid,
                         linkhash = linkhash,
-                        linkurl = entry.link
+                        linkurl = entry.link,
                         defaults={
                             'title': entry.get('title'),
                             'description': entry.get('description', ''),
