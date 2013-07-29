@@ -3342,25 +3342,25 @@ class JosMemberApplications(models.Model):
 #     class Meta:
 #         db_table = u'jos_newsfeeds'
 
-# class JosNewslinks(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     catid = models.IntegerField()
-#     sid = models.IntegerField()
-#     title = models.CharField(max_length=750)
-#     url = models.CharField(max_length=750)
-#     linkalias = models.CharField(max_length=750)
-#     pubdate = models.DateTimeField()
-#     date = models.DateTimeField()
-#     hits = models.IntegerField()
-#     published = models.IntegerField()
-#     checked_out = models.IntegerField()
-#     checked_out_time = models.DateTimeField()
-#     ordering = models.IntegerField()
-#     archived = models.IntegerField()
-#     approved = models.IntegerField()
-#     params = models.TextField()
-#     class Meta:
-#         db_table = u'jos_newslinks'
+class JosNewslinks(models.Model):
+    id = models.IntegerField(primary_key=True)
+    catid = models.IntegerField()
+    sid = models.IntegerField()
+    title = models.CharField(max_length=750)
+    url = models.CharField(max_length=750)
+    linkalias = models.CharField(max_length=750)
+    pubdate = models.DateTimeField()
+    date = models.DateTimeField()
+    hits = models.IntegerField()
+    published = models.IntegerField()
+    checked_out = models.IntegerField()
+    checked_out_time = models.DateTimeField()
+    ordering = models.IntegerField()
+    archived = models.IntegerField()
+    approved = models.IntegerField()
+    params = models.TextField()
+    class Meta:
+        db_table = u'jos_newslinks'
 
 # class JosOcwCatalogCourses(models.Model):
 #     id = models.IntegerField(primary_key=True)
