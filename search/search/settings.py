@@ -96,6 +96,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
+    'rest_framework',
     'search',
     'south',
     'web',
@@ -111,6 +112,11 @@ INSTALLED_APPS = (
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(name)s %(process)d %(thread)d %(message)s'
+        },    
+    },
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse'
@@ -121,7 +127,12 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },        
     },
     'loggers': {
         'django.request': {
@@ -129,7 +140,14 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+        'pysolarized': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False,
+        },                
     }
 }
+
+SOLR_URL = "http://localhost:8984/solr/%s/"
 
 from localsettings import *
