@@ -76,9 +76,11 @@ def make_lang():
     for lang in LANG_MAPPING:
         solr_lang = LANG_MAPPING[lang]
         # print solr_lang
-        for doc in JosOcwCourses.objects.filter(language=lang):
+        # for doc in JosOcwCourses.objects.filter(language=lang):
+        for doc in JosOcwCourses.objects.filter(linkhash='344b657bb4b90131e9954482ace73349'):
             if solr_lang in ['english',]: 
                 topLanguageName, topLanguageCode, isReliable, textBytesFound, details = cld.detect(doc.title.encode('utf-8') + " " + doc.description.encode('utf-8'))
+                print topLanguageName, doc.title
                 if topLanguageCode not in  ['en','un']:
                     # force unidentified languages into English
                     if topLanguageCode == 'un':
