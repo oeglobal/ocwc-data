@@ -14,20 +14,20 @@ from .serializers import CourseSerializer
 from joomla.models import JosOcwCourses
 
 def index(request):
-	if request.GET.get('q'):
-		q = request.GET.get('q')
-		SOLR_URL = settings.SOLR_URL % 'default'
-		solr = pysolarized.Solr(SOLR_URL)
+    if request.GET.get('q'):
+        q = request.GET.get('q')
+        SOLR_URL = settings.SOLR_URL % 'default'
+        solr = pysolarized.Solr(SOLR_URL)
 
-		results = solr.query(q)
-		if results:
-			response = results.documents
-		else:
-			response = {'error': 'Search is currently not available'}
-	else:
-		response = {'error': 'Please use q parameter for search'}
+        results = solr.query(q)
+        if results:
+            response = results.documents
+        else:
+            response = {'error': 'Search is currently not available'}
+    else:
+        response = {'error': 'Please use q parameter for search'}
 
-	return HttpResponse(json.dumps(response), content_type="application/json")
+    return HttpResponse(json.dumps(response), content_type="application/json")
 
 @api_view(['GET'])
 def course_detail(request, linkhash):
@@ -35,10 +35,16 @@ def course_detail(request, linkhash):
     Retrieve course instance.
     """              
     try:
-    	course = JosOcwCourses.objects.get(linkhash=linkhash)
+        course = JosOcwCourses.objects.get(linkhash=linkhash)
     except JosOcwCourses.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
         serializer = CourseSerializer(course)
         return Response(serializer.data)
+
+@api_view(['GET'])
+def course_latest(request):
+    course_list = JosOcwCourses.objects.all().order_by('-id')[:10]
+    serializer = CourseSerializer(course_list)
+    return Response(serializer.data)
