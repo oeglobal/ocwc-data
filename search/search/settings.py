@@ -96,6 +96,7 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
 
     'gunicorn',
+    'raven.contrib.django.raven_compat',
     'rest_framework',
     'rest_framework_swagger',
 
@@ -158,5 +159,6 @@ SWAGGER_SETTINGS = {
         "GET"
     ]
 }
+ALLOWED_HOSTS = ['data.ocwconsortium.org',]
 
 from localsettings import *
