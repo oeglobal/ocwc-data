@@ -82,9 +82,7 @@ ROOT_URLCONF = 'search.urls'
 WSGI_APPLICATION = 'search.wsgi.application'
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
+    next_to_root('search/web/templates')
 )
 
 INSTALLED_APPS = (
@@ -96,8 +94,11 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
+
     'gunicorn',
     'rest_framework',
+    'rest_framework_swagger',
+
     'search',
     'south',
     'web',
@@ -150,5 +151,12 @@ LOGGING = {
 }
 
 SOLR_URL = "http://localhost:8984/solr/%s/"
+
+SWAGGER_SETTINGS = {
+    "api_version": 0.1,
+    "enabled_methods": [
+        "GET"
+    ]
+}
 
 from localsettings import *
