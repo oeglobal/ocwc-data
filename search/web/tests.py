@@ -1,16 +1,17 @@
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
+from rest_framework.test import APITestCase
 
-Replace this with more appropriate tests for your application.
-"""
+class testCoursesAPI(APITestCase):
+	fixtures = ['test-fixtures.json']
 
-from django.test import TestCase
+	def testCourses(self):
+		from data.models import Course
+		
+		latest_course = Course.objects.latest('id')
 
+		response = self.client.get('/api/v1/courses/latest/')
+		self.assertEqual(response.data[0]['linkhash'], latest_course.linkhash)
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.assertEqual(1 + 1, 2)
+		response = self.client.get('/api/v1/courses/view/%s/' % latest_course.linkhash)
+		self.assertEqual(response.data.get('linkhash'), latest_course.linkhash)
+
+	

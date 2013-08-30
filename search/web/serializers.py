@@ -1,12 +1,12 @@
 from rest_framework import serializers
-from joomla.models import JosOcwCourses, CfGetorgs
+from data.models import Course, Provider
 
 class CourseSerializer(serializers.ModelSerializer):
 	class Meta:
-		model = JosOcwCourses
-		fields = ('linkhash', 'title', 'description', 'tags', 'source', 'language', 'date_published', 'id', 'linkurl', 'author', 'crmid')
+		model = Course
+		fields = ('linkhash', 'title', 'description', 'tags', 'source', 'language', 'date_published', 'id', 'linkurl', 'author')
 
-class SourceSerializer(serializers.ModelSerializer):
+class ProviderSerializer(serializers.ModelSerializer):
 	class Meta:
-		model = CfGetorgs
+		model = Provider
 		fields = ('id', 'source', 'crmid')

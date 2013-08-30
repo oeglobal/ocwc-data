@@ -14,7 +14,7 @@ from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
 from .serializers import CourseSerializer
-from joomla.models import JosOcwCourses
+from data.models import Course, Provider
 
 @api_view(['GET'])
 def index(request):
@@ -60,12 +60,11 @@ class CourseDetail(APIView):
     """
     def get_object(self, linkhash):
         try:
-            return JosOcwCourses.objects.get(linkhash=linkhash)
-        except JosOcwCourses.DoesNotExist:
+            return Course.objects.get(linkhash=linkhash)
+        except Course.DoesNotExist:
             raise Http404
 
     def get(self, request, linkhash, format=None):
-        print linkhash
         course = self.get_object(linkhash)
         serializer = CourseSerializer(course, many=False)
         return Response(serializer.data)
@@ -75,12 +74,12 @@ def course_latest(request):
     """
     List latest courses added to the database.
     """
-    course_list = JosOcwCourses.objects.all().order_by('-id')[:10]
+    course_list = Course.objects.all().order_by('-id')[:10]
     serializer = CourseSerializer(course_list)
     return Response(serializer.data)
 
 @api_view(['GET'])
 def source_list(request, crmid):
-    course_list = JosOcwCourses.objects.filter(crmid=crmid).order_by('-id')[:10]
+    course_list = Course.objects.filter(crmid=crmid).order_by('-id')[:10]
     serializer = CourseSerializer(course_list)
     return Response(serializer.data)    

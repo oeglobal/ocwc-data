@@ -1,0 +1,121 @@
+[
+{
+    "pk": 1, 
+    "model": "data.provider", 
+    "fields": {
+        "active": true, 
+        "external_id": "3530", 
+        "name": "African Virtual University"
+    }
+},
+{
+    "pk": 2, 
+    "model": "data.provider", 
+    "fields": {
+        "active": true, 
+        "external_id": "1871", 
+        "name": "AGH University of Science and Technology"
+    }
+},
+{
+    "pk": 3, 
+    "model": "data.provider", 
+    "fields": {
+        "active": true, 
+        "external_id": "127", 
+        "name": "Capilano University"
+    }
+},
+{
+    "pk": 1, 
+    "model": "data.source", 
+    "fields": {
+        "url": "http://example.com/rss-modules.xml", 
+        "kind": "rss", 
+        "update_speed": 0, 
+        "provider": 1
+    }
+},
+{
+    "pk": 2, 
+    "model": "data.source", 
+    "fields": {
+        "url": "http://example.com/feed.xml", 
+        "kind": "rss", 
+        "update_speed": 0, 
+        "provider": 2
+    }
+},
+{
+    "pk": 3, 
+    "model": "data.source", 
+    "fields": {
+        "url": "http://example.com/rss", 
+        "kind": "rss", 
+        "update_speed": 0, 
+        "provider": 3
+    }
+},
+{
+    "pk": 1, 
+    "model": "data.course", 
+    "fields": {
+        "license": "", 
+        "rights": "", 
+        "description": "A Programaco Linear module authored by David KJ Mtetwa.", 
+        "language": "English", 
+        "title": "A Programaco Linear", 
+        "tags": "", 
+        "date_indexed": "2012-05-22T10:09:43", 
+        "source": 1, 
+        "author": "", 
+        "contributors": "", 
+        "provider": 1, 
+        "linkhash": "e2639864b8a3a3e15188c5a96ae789ae", 
+        "date_modified": "2013-08-30T09:14:12.558", 
+        "linkurl": "http://oer.avu.org/handle/123456789/267", 
+        "date_published": "2011-06-08T20:00:00"
+    }
+},
+{
+    "pk": 2, 
+    "model": "data.course", 
+    "fields": {
+        "license": "", 
+        "rights": "", 
+        "description": "Analysis 2 module authored by Jairus M. Khalagai Part 2 consists of three units: Real Analysis, Topology, Measure Theory", 
+        "language": "English", 
+        "title": "Analysis 2", 
+        "tags": "", 
+        "date_indexed": "2012-05-22T10:09:43", 
+        "source": 1, 
+        "author": "", 
+        "contributors": "", 
+        "provider": 1, 
+        "linkhash": "0434a9aa1fc2daa21258a6cb17f4eb28", 
+        "date_modified": "2013-08-30T09:14:12.564", 
+        "linkurl": "http://oer.avu.org/handle/123456789/274", 
+        "date_published": "2011-06-08T20:00:00"
+    }
+},
+{
+    "pk": 3, 
+    "model": "data.course", 
+    "fields": {
+        "license": "", 
+        "rights": "", 
+        "description": "Separaco, Tecnicas Electroanaltica e Espectroqumica module authored by Vincent Makokha.", 
+        "language": "English", 
+        "title": "Separaco, Tecnicas Electroanaltica e Espectroqumica", 
+        "tags": "", 
+        "date_indexed": "2012-05-22T10:09:43", 
+        "source": 1, 
+        "author": "", 
+        "contributors": "", 
+        "provider": 1, 
+        "linkhash": "344b657bb4b90131e9954482ace73349", 
+        "date_modified": "2013-08-30T09:14:12.569", 
+        "linkurl": "http://oer.avu.org/handle/123456789/266", 
+        "date_published": "2011-06-08T20:00:00"
+    }
+}]
