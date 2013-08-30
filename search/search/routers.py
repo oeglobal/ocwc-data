@@ -22,6 +22,6 @@ class Router(object):
         "Make sure the myapp app only appears on the 'other' db"
         
         if model._meta.app_label == 'joomla':
-            return True
+            return False
         else:
             return True
