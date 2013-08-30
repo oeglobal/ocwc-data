@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pysolarized
 from pprint import pprint 
 import json
