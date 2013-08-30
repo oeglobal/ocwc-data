@@ -12,6 +12,8 @@ LANG_MAPPING = {
     'Chinese': 'chinese',
         'Chineset': 'chinese',
         'Chinese - Traditional': 'chinese',
+    'Czech': 'czech',
+    'Basque': 'basque',
     'Dutch': 'dutch',
     'French': 'french',
     'Spanish': 'spanish',
@@ -35,4 +37,5 @@ LANG_MAPPING = {
     'Malay': 'malay',
     'Finnish': 'finnish',
     'Turkish': 'turkish',
+    'Italian': 'italian'
 }

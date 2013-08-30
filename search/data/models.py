@@ -35,8 +35,8 @@ class Course(models.Model):
     contributors = models.CharField(max_length=765, blank=True, default='')
     license = models.TextField(blank=True, default='')
     
-    date_published = models.DateTimeField() # auto_now_add=True)
-    date_indexed = models.DateTimeField() #auto_now=True)
+    date_published = models.DateTimeField(auto_now_add=True)
+    date_indexed = models.DateTimeField(auto_now=True)
     date_modified = models.DateTimeField(auto_now=True)
 
 LOG_STATUS_CHOICES = (
