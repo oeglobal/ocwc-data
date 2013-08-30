@@ -12,8 +12,9 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
+from rest_framework import viewsets, generics
 
-from .serializers import CourseSerializer
+from .serializers import *
 from data.models import Course, Provider
 
 @api_view(['GET'])
@@ -36,6 +37,7 @@ def index(request):
         'search': reverse('search-query', request=request),
         'course-latest': reverse('course-latest', request=request),
         'course-detail': reverse('course-detail', args=('3ab55059096d526167866d058a550818',), request=request),
+        'providers-list': reverse('providers-list', request=request),
     })
 
 def search(request):
@@ -69,17 +71,16 @@ class CourseDetail(APIView):
         serializer = CourseSerializer(course, many=False)
         return Response(serializer.data)
 
-@api_view(['GET'])
-def course_latest(request):
+class CourseLatestList(generics.ListAPIView):
     """
-    List latest courses added to the database.
+    List latest Courses added to the database.
     """
-    course_list = Course.objects.all().order_by('-id')[:10]
-    serializer = CourseSerializer(course_list)
-    return Response(serializer.data)
+    queryset = Course.objects.all().order_by('-id')[:10]
+    serializer_class = CourseSerializer
 
-@api_view(['GET'])
-def source_list(request, crmid):
-    course_list = Course.objects.filter(crmid=crmid).order_by('-id')[:10]
-    serializer = CourseSerializer(course_list)
-    return Response(serializer.data)    
+class ProviderList(generics.ListAPIView):
+    """
+    List all Course Providers in database
+    """
+    queryset = Provider.objects.all()
+    serializer_class = ProviderSerializer

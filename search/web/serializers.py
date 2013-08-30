@@ -9,4 +9,4 @@ class CourseSerializer(serializers.ModelSerializer):
 class ProviderSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Provider
-		fields = ('id', 'source', 'crmid')
+		fields = ('id', 'name', 'external_id')

@@ -14,4 +14,11 @@ class testCoursesAPI(APITestCase):
 		response = self.client.get('/api/v1/courses/view/%s/' % latest_course.linkhash)
 		self.assertEqual(response.data.get('linkhash'), latest_course.linkhash)
 
-	
+	def testProviders(self):
+		from data.models import Provider
+
+		provider = Provider.objects.latest('id')
+
+		response = self.client.get('/api/v1/providers/')
+		self.assertEqual(len(response.data), Provider.objects.count())
+		self.assertEqual(response.data[-1].get('id'), provider.id)

@@ -98,7 +98,6 @@ INSTALLED_APPS = (
     'gunicorn',
     'raven.contrib.django.raven_compat',
     'rest_framework',
-    'rest_framework_swagger',
 
     'search',
     'south',
