@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
-from rest_framework import viewsets, generics
+from rest_framework import viewsets, generics, mixins
 
 from .serializers import *
 from data.models import Course, Provider
@@ -39,6 +39,8 @@ def index(request):
         'course-latest': reverse('course-latest', request=request),
         'course-detail': reverse('course-detail', args=('3ab55059096d526167866d058a550818',), request=request),
         'providers-list': reverse('providers-list', request=request),
+        'provider-detail': reverse('provider-detail', args=('1'), request=request),
+        'provider-course-list': reverse('provider-courses-list', args=('1'), request=request),
     })
 
 def search(request):
@@ -57,20 +59,12 @@ def search(request):
 
     return HttpResponse(json.dumps(response), content_type="application/json")
 
-class CourseDetail(APIView):
+class CourseDetail(generics.RetrieveAPIView):
     """
     Retrieve information on a specific course. Currently through linkhash parameter.
     """
-    def get_object(self, linkhash):
-        try:
-            return Course.objects.get(linkhash=linkhash)
-        except Course.DoesNotExist:
-            raise Http404
-
-    def get(self, request, linkhash, format=None):
-        course = self.get_object(linkhash)
-        serializer = CourseSerializer(course, many=False)
-        return Response(serializer.data)
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
 
 class CourseLatestList(generics.ListAPIView):
     """
@@ -78,6 +72,22 @@ class CourseLatestList(generics.ListAPIView):
     """
     queryset = Course.objects.all().order_by('-id')[:10]
     serializer_class = CourseSerializer
+
+class ProviderDetail(generics.RetrieveAPIView):
+    """
+    Retrieve specific information about each provider. Providers are usually educational institutions 
+    from which we aggregate course data.
+    """
+    queryset = Provider.objects.all()
+    serializer_class = ProviderSerializer
+
+class ProviderCourseList(generics.ListAPIView):
+    """
+    List all available Courses for Provider
+    """
+    def get_queryset(self):
+        return Course.objects.filter(**self.kwargs)
+    serializer_class = CourseListSerializer
 
 class ProviderList(generics.ListAPIView):
     """
