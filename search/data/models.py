@@ -6,6 +6,9 @@ class Provider(models.Model):
     external_id = models.TextField()
     active = models.BooleanField(default=True)
 
+    def __unicode__(self):
+        return self.name
+
 SOURCE_KIND_CHOICES = (
     ('rss', 'RSS feed'),
     ('scraper', 'Gatherer scraper'),
@@ -17,6 +20,9 @@ class Source(models.Model):
     kind = models.CharField(choices=SOURCE_KIND_CHOICES, default='rss', max_length=50)
     url  = models.TextField(blank=True, default='')
     update_speed = models.IntegerField(default=0, help_text='Update speed in days, 0 to disable')
+
+    def __unicode__(self):
+        return u"%s (%s)" % (self.provider.name, self.kind)
 
 class Course(models.Model):
     title = models.TextField()

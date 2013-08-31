@@ -153,12 +153,6 @@ LOGGING = {
 
 SOLR_URL = "http://localhost:8984/solr/%s/"
 
-SWAGGER_SETTINGS = {
-    "api_version": 0.1,
-    "enabled_methods": [
-        "GET"
-    ]
-}
 ALLOWED_HOSTS = ['data.ocwconsortium.org',]
 
 from localsettings import *
