@@ -36,6 +36,7 @@ def index(request):
 
     return Response({
         'search': reverse('search-query', request=request),
+        'course-stats': reverse('course-stats', request=request),
         'course-latest': reverse('course-latest', request=request),
         'course-detail': reverse('course-detail', args=('3ab55059096d526167866d058a550818',), request=request),
         'providers-list': reverse('providers-list', request=request),
@@ -58,6 +59,13 @@ def search(request):
         response = {'error': 'Please use q parameter for search'}
 
     return HttpResponse(json.dumps(response), content_type="application/json")
+
+@api_view(['GET'])
+def course_stats(request):
+    return Response({
+        'courses': Course.objects.all().count(),
+        'providers': Provider.objects.all().count()
+        })
 
 class CourseDetail(generics.RetrieveAPIView):
     """
