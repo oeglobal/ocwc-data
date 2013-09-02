@@ -6,14 +6,14 @@ LANG_MAPPING = {
         'en-US': 'english',
         'en-us': 'english',
         u'ingl\xe9s': u'english',
-    'Basque': 'basque',
+    
     'Catalan': 'catalan',
         'ca': 'catalan',
-    'Chamorro': 'chamorro',
+    
     'Chinese': 'chinese',
         'Chineset': 'chinese',
         'Chinese - Traditional': 'chinese',
-    'Czech': 'czech',
+    
     'Dutch': 'dutch',
     'French': 'french',
     'Spanish': 'spanish',
@@ -38,4 +38,15 @@ LANG_MAPPING = {
     'Malay': 'malay',
     'Finnish': 'finnish',
     'Turkish': 'turkish',
+    'Slovenian': 'slovenian',
+    
+    # 'Greek': 'greek',
+    # 'Basque': 'basque',
+    # 'Chamorro': 'chamorro',
+    # 'Tagalog': 'tagalog',
+    # 'Romanian': 'romanian',
+    # 'Czech': 'czech',
+    # 'Danish': 'danish',
+    # 'Norwegian': 'norwegian',
+    
 }

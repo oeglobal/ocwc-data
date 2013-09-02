@@ -1,5 +1,5 @@
 from django.db import models
-
+import hashlib
 
 class Provider(models.Model):
     name = models.CharField(max_length=255)
@@ -44,6 +44,15 @@ class Course(models.Model):
     date_published = models.DateTimeField(auto_now_add=True)
     date_indexed = models.DateTimeField(auto_now=True)
     date_modified = models.DateTimeField(auto_now=True)
+
+    def save(self, force_insert=False, force_update=False, using=None):
+        if not self.linkhash:
+            m = hashlib.md5()
+            m.update(self.linkurl)
+            self.linkhash = m.hexdigest()
+
+        super(Course, self).save(force_insert=force_insert, force_update=force_update, using=using)
+
 
 LOG_STATUS_CHOICES = (
     (0, 'Failed'),
