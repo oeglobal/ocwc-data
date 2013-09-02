@@ -8,5 +8,5 @@ urlpatterns = patterns('',
 
 	url(r'^courses/latest/$', views.CourseLatestList.as_view(), name='course-latest'),
 	url(r'^courses/view/(?P<linkhash>\w+)/$', views.CourseDetail.as_view(lookup_field='linkhash'), name='course-detail'),
-	url(r'^search/$', 'web.views.search', name='search-query'),
+	url(r'^courses/search/$', 'web.views.search', name='search-query'),
 )

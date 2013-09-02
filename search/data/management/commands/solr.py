@@ -28,7 +28,8 @@ class Command(BaseCommand):
 
     def solr_default_shards(self):
         languages = sorted(set(LANG_MAPPING.values()))
-        line = '<str name="shards">' + ','.join([settings.SOLR_URL % lang for lang in languages]) + '</str>'
+        solr_url = settings.SOLR_URL.lstrip('http://')
+        line = '<str name="shards">' + ','.join([solr_url % lang for lang in languages]) + '</str>'
         self.stdout.write(line)
 
     def delete_all(self):
