@@ -24,6 +24,12 @@ class Source(models.Model):
     def __unicode__(self):
         return u"%s (%s)" % (self.provider.name, self.kind)
 
+CONTENT_MEDIUM_CHOICES = (
+    ('text', 'Text'),
+    ('video', 'Video'),
+    ('audio', 'Audio')
+)
+
 class Course(models.Model):
     title = models.TextField()
     linkhash = models.CharField(max_length=96, unique=True)
@@ -44,6 +50,8 @@ class Course(models.Model):
     date_published = models.DateTimeField(auto_now_add=True)
     date_indexed = models.DateTimeField(auto_now=True)
     date_modified = models.DateTimeField(auto_now=True)
+
+    content_medium = models.CharField(max_length=100, choices=CONTENT_MEDIUM_CHOICES, default='text')
 
     def save(self, force_insert=False, force_update=False, using=None):
         if not self.linkhash:
