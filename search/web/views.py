@@ -30,8 +30,11 @@ def index(request):
 
     If you have any questions or comments please contact [Jure Cuhalev][jure].
 
+    You can follow development in our [Github repository][github].
+
     [jure]: mailto:jure@ocwconsortium.org
     [search]: http://www.ocwconsortium.org/en/courses/search
+    [github]: https://github.com/ocwc/ocwc-data
     """
 
     return Response({
@@ -42,6 +45,8 @@ def index(request):
         'providers-list': reverse('providers-list', request=request),
         'provider-detail': reverse('provider-detail', args=('1'), request=request),
         'provider-course-list': reverse('provider-courses-list', args=('1'), request=request),
+        'language-list': reverse('language-list', request=request),
+        'language-courses-list': reverse('language-courses-list', kwargs={'language': 'English'}, request=request)
     })
 
 def search(request):
@@ -103,5 +108,23 @@ class ProviderList(generics.ListAPIView):
     """
     List all Course Providers in database
     """
-    queryset = Provider.objects.all()
+    queryset = Provider.objects.all().order_by('name')
     serializer_class = ProviderSerializer
+
+class LanguageList(viewsets.ViewSet):
+    """
+    List all Languages in the database
+    """
+    def list(self, request):
+        data = Course.objects.all().order_by('language').values_list('language', flat=True).distinct()
+        return Response(data)
+
+class LanguageCourseList(generics.ListAPIView):
+    """
+    List all available Courses for Language
+    """
+    def get_queryset(self):
+        return Course.objects.filter(**self.kwargs)
+    serializer_class = CourseListSerializer
+    paginate_by = 25
+    paginate_by_param = 'limit'

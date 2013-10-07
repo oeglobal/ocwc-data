@@ -10,4 +10,8 @@ urlpatterns = patterns('',
 	url(r'^courses/latest/$', views.CourseLatestList.as_view(), name='course-latest'),
 	url(r'^courses/view/(?P<linkhash>\w+)/$', views.CourseDetail.as_view(lookup_field='linkhash'), name='course-detail'),
 	url(r'^courses/search/$', 'web.views.search', name='search-query'),
+
+	url(r'^languages/(?P<language>[\w|\W]+)/courses/$', views.LanguageCourseList.as_view(lookup_field='language'), name='language-courses-list'),
+	url(r'^languages/$', views.LanguageList.as_view({'get': 'list'}), name='language-list'),
+
 )
