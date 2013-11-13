@@ -23,25 +23,6 @@ def main(filename):
         item = u'''
         <item>
             <title>{link.title}</title>
-            <pubDate>{link.pubdate}</pubDate>
-            <dc:creator>gandalf</dc:creator>
-            <description></description>
-            <content:encoded><![CDATA[]]></content:encoded>
-            <excerpt:encoded><![CDATA[]]></excerpt:encoded>
-            <wp:post_id>1583</wp:post_id>
-            <wp:post_date>{link.pubdate}</wp:post_date>
-            <wp:comment_status>closed</wp:comment_status>
-            <wp:ping_status>closed</wp:ping_status>
-            <wp:post_name></wp:post_name>
-            <wp:status>draft</wp:status>
-            <wp:post_parent>0</wp:post_parent>
-            <wp:menu_order>0</wp:menu_order>
-            <wp:post_type>newslink</wp:post_type>
-            <wp:post_password></wp:post_password>
-            <wp:is_sticky>0</wp:is_sticky>
-        </item>
-        <item>
-            <title>{link.title}</title>
             
             <pubDate>{link.pubdate}</pubDate>
             <dc:creator>gandalf</dc:creator>
