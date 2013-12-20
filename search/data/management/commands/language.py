@@ -33,4 +33,4 @@ class Command(BaseCommand):
                         course.save()
                         continue
                     else:
-                    	self.stdout.write("New language %s %s %s" % (topLanguageName, topLanguageCode, isReliable))
+                    	self.stdout.write("New language %s %s (reliable: %s)" % (topLanguageName, topLanguageCode, isReliable))
