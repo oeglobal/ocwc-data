@@ -118,7 +118,7 @@ LOGGING = {
     'formatters': {
         'verbose': {
             'format': '%(levelname)s %(asctime)s %(name)s %(process)d %(thread)d %(message)s'
-        },    
+        },
     },
     'filters': {
         'require_debug_false': {
@@ -135,7 +135,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
-        },        
+        },
     },
     'loggers': {
         'django.request': {
@@ -147,12 +147,15 @@ LOGGING = {
             'level': 'DEBUG',
             'handlers': ['console'],
             'propagate': False,
-        },                
+        },
     }
 }
 
 SOLR_URL = "http://localhost:8984/solr/%s/"
 
 ALLOWED_HOSTS = ['data.ocwconsortium.org',]
+
+MEMBERS_API_USERNAME = ''
+MEMBERS_API_PASSWORD = ''
 
 from localsettings import *
