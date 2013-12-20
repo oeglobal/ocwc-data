@@ -34,4 +34,3 @@ class Command(BaseCommand):
                         continue
                     else:
                     	self.stdout.write("New language %s %s %s" % (topLanguageName, topLanguageCode, isReliable))
-                        
