@@ -32,9 +32,12 @@ def index(request):
 
     You can follow development in our [Github repository][github].
 
+    If you would just like a copy of the data, you can download Excel export [from here][dbdump].
+
     [jure]: mailto:jure@ocwconsortium.org
     [search]: http://www.ocwconsortium.org/en/courses/search
     [github]: https://github.com/ocwc/ocwc-data
+    [dbdump]: http://data.ocwconsortium.org/dbdump/
     """
 
     return Response({
