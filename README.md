@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/ocwc/ocwc-data.png?branch=master)](https://travis-ci.org/ocwc/ocwc-data)
+
 About
 =====
 
