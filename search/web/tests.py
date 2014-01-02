@@ -22,4 +22,4 @@ class testCoursesAPI(APITestCase):
 
 		response = self.client.get('/api/v1/providers/')
 		self.assertEqual(len(response.data), Provider.objects.count())
-		self.assertEqual(response.data[-1].get('id'), provider.id))
+		self.assertEqual(response.data[-1].get('id'), provider.id)
