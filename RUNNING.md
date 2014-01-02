@@ -5,7 +5,7 @@
 	* bin/django update_providers --add [id]
 * bin/django feeds --update-all
 * bin/django solr --delete-all
-* bin/djanog solr --update-all* 
+* bin/django solr --update-all
 
 ## Add new language
 
