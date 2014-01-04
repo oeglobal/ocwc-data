@@ -3,7 +3,7 @@ from django.contrib import admin
 from .models import *
 
 class CourseAdmin(admin.ModelAdmin):
-	list_display = ('title', 'language', 'provider')
+	list_display = ('title', 'language', 'provider', 'calais_socialtags', 'calais_topics')
 	list_filter = ('language', 'provider')
 
 class SourceAdmin(admin.ModelAdmin):

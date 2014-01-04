@@ -53,6 +53,11 @@ class Course(models.Model):
 
     content_medium = models.CharField(max_length=100, choices=CONTENT_MEDIUM_CHOICES, default='text')
 
+    translated_text = models.TextField(blank=True)
+    calais_socialtags = models.TextField(blank=True)
+    calais_topics = models.TextField(blank=True)
+    opencalais_response = models.TextField(blank=True)
+
     def save(self, force_insert=False, force_update=False, using=None):
         if not self.linkhash:
             m = hashlib.md5()
