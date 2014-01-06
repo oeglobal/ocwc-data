@@ -11,7 +11,13 @@ urlpatterns = patterns('',
 	url(r'^courses/view/(?P<linkhash>\w+)/$', views.CourseDetail.as_view(lookup_field='linkhash'), name='course-detail'),
 	url(r'^courses/search/$', 'web.views.search', name='search-query'),
 
-	url(r'^languages/(?P<language>[\w|\W]+)/courses/$', views.LanguageCourseList.as_view(lookup_field='language'), name='language-courses-list'),
+	url(r'^languages/(?P<language>[\w|\W]+)/courses/$', views.CourseList.as_view(lookup_field='language'), name='language-courses-list'),
 	url(r'^languages/$', views.LanguageList.as_view({'get': 'list'}), name='language-list'),
 
-)
+	url(r'^categories/(?P<category>[\w|\W]+)/(?P<language>[\w|\W]+)/$', views.CourseCategoryList.as_view(), name='category-course-list'),
+	url(r'^categories/(?P<category>[\w|\W]+)/$', views.CourseCategoryList.as_view(), name='category-course-list'),
+	
+	
+	url(r'^categories/(?P<language>[\w|\W]+)/$', views.CategoryList.as_view(), name='category-list'),
+	url(r'^categories/$', views.CategoryList.as_view(), name='category-list'),
+)	

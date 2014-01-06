@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
+import json
 import pysolarized
 from pprint import pprint 
-import json
-from requests import ConnectionError
+from collections import OrderedDict
 
 from django.shortcuts import render
 from django.http import HttpResponse, Http404
-
 from django.conf import settings
 
 from rest_framework.response import Response
@@ -16,7 +15,7 @@ from rest_framework.views import APIView
 from rest_framework import viewsets, generics, mixins
 
 from .serializers import *
-from data.models import Course, Provider
+from data.models import Course, Provider, Category
 
 @api_view(['GET'])
 def index(request):
@@ -40,17 +39,24 @@ def index(request):
     [dbdump]: http://data.ocwconsortium.org/dbdump/
     """
 
-    return Response({
-        'search': reverse('search-query', request=request),
-        'course-stats': reverse('course-stats', request=request),
-        'course-latest': reverse('course-latest', request=request),
-        'course-detail': reverse('course-detail', args=('3ab55059096d526167866d058a550818',), request=request),
-        'providers-list': reverse('providers-list', request=request),
-        'provider-detail': reverse('provider-detail', args=('1'), request=request),
-        'provider-course-list': reverse('provider-courses-list', args=('1'), request=request),
-        'language-list': reverse('language-list', request=request),
-        'language-courses-list': reverse('language-courses-list', kwargs={'language': 'English'}, request=request)
-    })
+    return Response(OrderedDict([
+        ('search', reverse('search-query', request=request)),
+        ('course-stats', reverse('course-stats', request=request)),
+        ('course-latest', reverse('course-latest', request=request)),
+        ('course-detail', reverse('course-detail', args=('59069fd6f629c3eefa5f8c5d6a39d96a',), request=request)),
+        ('providers-list', reverse('providers-list', request=request)),
+        ('provider-detail', reverse('provider-detail', args=('1'), request=request)),
+        ('provider-course-list', reverse('provider-courses-list', args=('1'), request=request)),
+        
+        ('language-list', reverse('language-list', request=request)),
+        ('language-courses-list', reverse('language-courses-list', kwargs={'language': 'English'}, request=request)),
+
+        ('category-course-list', reverse('category-course-list', kwargs={'category': 'Computer Science'}, request=request)),
+        ('category-language-course-list', reverse('category-course-list', kwargs={'language': 'English', 'category': 'Computer Science'}, request=request)),
+
+        ('category-list-default', reverse('category-list', request=request)),
+        ('category-list', reverse('category-list', kwargs={'language': 'English'}, request=request))
+    ]))
 
 def search(request):
     if request.GET.get('q'):
@@ -77,7 +83,15 @@ def course_stats(request):
 
 class CourseDetail(generics.RetrieveAPIView):
     """
-    Retrieve information on a specific course. Currently through linkhash parameter.
+    Retrieve information on a specific course. Course identifier is MD5 hash of
+    course URL. It's not optimal, but I haven't found anything better. This means 
+    that as courses get moved around it will change.
+
+    In python you can generate it by running:
+
+        import hashlib
+        link_url = 'http://ocw.uci.edu/lectures/lecture.aspx?id=406'
+        hashlib.md5(link_url.encode('utf-8')).hexdigest()
     """
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
@@ -122,7 +136,7 @@ class LanguageList(viewsets.ViewSet):
         data = Course.objects.all().order_by('language').values_list('language', flat=True).distinct()
         return Response(data)
 
-class LanguageCourseList(generics.ListAPIView):
+class CourseList(generics.ListAPIView):
     """
     List all available Courses for Language
     """
@@ -131,3 +145,42 @@ class LanguageCourseList(generics.ListAPIView):
     serializer_class = CourseListSerializer
     paginate_by = 25
     paginate_by_param = 'limit'
+
+class CourseCategoryList(generics.ListAPIView):
+    """
+    List all available Courses by Language and Category
+    """
+    serializer_class = CourseListSerializer
+    paginate_by = 25
+    paginate_by_param = 'limit'
+
+    def get_queryset(self):
+        category = self.kwargs.pop('category', None)
+        language = self.kwargs.pop('language', None)
+        
+        lookup_params = {}
+        if category:
+            lookup_params['categories__name'] = category
+        if language:
+            lookup_params['language'] = language
+
+        print lookup_params
+        return Course.objects.filter(**lookup_params)
+
+class CategoryList(generics.ListAPIView):
+    """
+    List all available Categories for Courses. By default it shows all languages,
+    but supports filtering by language.
+    """    
+    model = Category
+
+    def serialize_tree(self, queryset, language=None):
+        for obj in queryset:
+            data = CategoryListSerializer(obj, language=language).data
+            data['children'] = self.serialize_tree(obj.children.all(), language=language)
+            yield data
+
+    def list(self, request, **kwargs):
+        queryset = self.get_queryset().filter(parent=None)
+        data = self.serialize_tree(queryset, language=kwargs.get('language'))
+        return Response(data)
