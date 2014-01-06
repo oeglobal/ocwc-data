@@ -1,4 +1,6 @@
 from django.db import models
+from mptt.models import MPTTModel, TreeForeignKey, TreeManyToManyField
+
 import hashlib
 
 class Provider(models.Model):
@@ -58,11 +60,11 @@ class Course(models.Model):
     calais_topics = models.TextField(blank=True)
     opencalais_response = models.TextField(blank=True)
 
+    categories = TreeManyToManyField('Category', blank=True, null=True)
+
     def save(self, force_insert=False, force_update=False, using=None):
         if not self.linkhash:
-            m = hashlib.md5()
-            m.update(self.linkurl)
-            self.linkhash = m.hexdigest()
+            self.linkhash = hashlib.md5(self.linkurl.encode('utf-8')).hexdigest()
 
         super(Course, self).save(force_insert=force_insert, force_update=force_update, using=using)
 
@@ -79,3 +81,13 @@ class Log(models.Model):
 
     processed_courses = models.ManyToManyField(Course, related_name='processed_courses')
     new_courses = models.ManyToManyField(Course, related_name='new_courses')
+
+class Category(MPTTModel):
+    name = models.CharField(max_length=50, unique=True)
+    parent = TreeForeignKey('self', null=True, blank=True, related_name='children')
+
+    class MPTTMeta:
+        order_insertion_by = ['name']
+
+    def __unicode__(self):
+        return self.name

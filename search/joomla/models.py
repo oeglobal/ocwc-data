@@ -3362,29 +3362,29 @@ class JosNewslinks(models.Model):
     class Meta:
         db_table = u'jos_newslinks'
 
-# class JosOcwCatalogCourses(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     crmid = models.IntegerField()
-#     linkhash = models.CharField(max_length=96, unique=True)
-#     linkurl = models.TextField()
-#     title = models.TextField()
-#     description = models.TextField()
-#     tags = models.TextField()
-#     source = models.TextField()
-#     language = models.CharField(max_length=300)
-#     author = models.CharField(max_length=765)
-#     rights = models.TextField()
-#     contributors = models.CharField(max_length=765, blank=True)
-#     license = models.TextField(blank=True)
-#     type = models.CharField(max_length=765, blank=True)
-#     format = models.CharField(max_length=765, blank=True)
-#     level = models.CharField(max_length=765, blank=True)
-#     date_published = models.DateTimeField()
-#     date_indexed = models.DateTimeField()
-#     date_modified = models.DateTimeField()
-#     locked = models.IntegerField()
-#     class Meta:
-#         db_table = u'jos_ocw_catalog_courses'
+class JosOcwCatalogCourses(models.Model):
+    id = models.IntegerField(primary_key=True)
+    crmid = models.IntegerField()
+    linkhash = models.CharField(max_length=96, unique=True)
+    linkurl = models.TextField()
+    title = models.TextField()
+    description = models.TextField()
+    tags = models.TextField()
+    source = models.TextField()
+    language = models.CharField(max_length=300)
+    author = models.CharField(max_length=765)
+    rights = models.TextField()
+    contributors = models.CharField(max_length=765, blank=True)
+    license = models.TextField(blank=True)
+    type = models.CharField(max_length=765, blank=True)
+    format = models.CharField(max_length=765, blank=True)
+    level = models.CharField(max_length=765, blank=True)
+    date_published = models.DateTimeField(auto_now=True)
+    date_indexed = models.DateTimeField(auto_now=True)
+    date_modified = models.DateTimeField(auto_now=True)
+    locked = models.IntegerField()
+    class Meta:
+        db_table = u'jos_ocw_catalog_courses'
 
 # class JosOcwCategories(models.Model):
 #     id = models.IntegerField(primary_key=True)
@@ -3402,11 +3402,11 @@ class JosNewslinks(models.Model):
 #     class Meta:
 #         db_table = u'jos_ocw_course_category'
 
-# class JosOcwCourseOntology(models.Model):
-#     course_id = models.IntegerField()
-#     category_id = models.IntegerField()
-#     class Meta:
-#         db_table = u'jos_ocw_course_ontology'
+class JosOcwCourseOntology(models.Model):
+    course = models.ForeignKey('JosOcwCatalogCourses',primary_key=True)
+    category = models.ForeignKey('JosOcwOntology')
+    class Meta:
+        db_table = u'jos_ocw_course_ontology'
 
 class JosOcwCourses(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -3435,13 +3435,17 @@ class JosOcwCourses(models.Model):
     class Meta:
         db_table = u'jos_ocw_courses'
 
-# class JosOcwOntology(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     category = models.CharField(max_length=765)
-#     keywords = models.TextField(blank=True)
-#     parent_id = models.IntegerField()
-#     class Meta:
-#         db_table = u'jos_ocw_ontology'
+class JosOcwOntology(models.Model):
+    id = models.IntegerField(primary_key=True)
+    category = models.CharField(max_length=765)
+    keywords = models.TextField(blank=True)
+    parent = models.ForeignKey('self')
+    
+    class Meta:
+        db_table = u'jos_ocw_ontology'
+
+    def __unicode__(self):
+        return self.category
 
 # class JosOcwcsiteterms(models.Model):
 #     id = models.IntegerField(primary_key=True)
