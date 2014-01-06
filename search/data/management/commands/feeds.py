@@ -53,7 +53,7 @@ class Command(BaseCommand):
                 )
             else:
                 link = entry.id
-                linkhash = hashlib.md5(self.link.encode('utf-8')).hexdigest()
+                linkhash = hashlib.md5(link.encode('utf-8')).hexdigest()
                 course, created = Course.objects.get_or_create(
                     linkhash = linkhash,
                     linkurl = link,
