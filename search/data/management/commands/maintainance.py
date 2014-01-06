@@ -30,3 +30,18 @@ class Command(BaseCommand):
                   print 'new digest for', [course.title]
                   course.linkhash = digest
                   course.save()
+
+    def check_broken_links(self):
+        pass
+        # for jos_course in JosOcwCatalogCourses.objects.filter(pk__gt=6035):
+        #   try:
+        #       course = Course.objects.get(linkhash=jos_course.linkhash)
+        #   except Course.DoesNotExist:
+        #       # print jos_course.linkhash, jos_course.source, jos_course.title
+        #       # print [jos_course.source]
+        #       print jos_course.id, jos_course.linkurl
+        #       r = requests.get(jos_course.linkurl)
+        #       if r.status_code == 404:
+        #           print 'deleting'
+        #           jos_course.delete()
+        
