@@ -8,9 +8,7 @@ import json
 import os
 import hashlib
 
-def main(crmid=None):
-    m = hashlib.md5()
-    
+def main(crmid=None):    
     if crmid:
         filename_list = ['scraped/%s.json' % crmid]
     else:
@@ -29,8 +27,7 @@ def main(crmid=None):
         for raw_entry in raw_data:
             entry = json.loads(raw_entry)
             link = entry.get('url')
-            m.update(link)
-            linkhash = m.hexdigest()
+            linkhash = hashlib.md5(link.encode('utf-8')).hexdigest()
 
             JosOcwCourses.objects.create(
                 crmid_id = crmid,

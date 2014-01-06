@@ -8,8 +8,6 @@ from optparse import make_option
 
 from data.models import Course, Source
 
-m = hashlib.md5()
-
 class Command(BaseCommand):
     help = "Manage RSS feeds that are defined in Sources for Providers"
     args = "--update-all --update-source [id]"
@@ -40,8 +38,7 @@ class Command(BaseCommand):
         for entry in d.entries:
             #it's a normal rss
             if entry.get('link'):
-                m.update(entry.link)
-                linkhash = m.hexdigest()
+                linkhash = hashlib.md5(entry.link.encode('utf-8')).hexdigest()
 
                 course, created = Course.objects.get_or_create(
                     linkhash = linkhash,
@@ -56,8 +53,7 @@ class Command(BaseCommand):
                 )
             else:
                 link = entry.id
-                m.update(link)
-                linkhash = m.hexdigest()
+                linkhash = hashlib.md5(self.link.encode('utf-8')).hexdigest()
                 course, created = Course.objects.get_or_create(
                     linkhash = linkhash,
                     linkurl = link,
