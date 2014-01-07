@@ -52,7 +52,7 @@ def index(request):
         ('language-courses-list', reverse('language-courses-list', kwargs={'language': 'English'}, request=request)),
 
         ('category-course-list', reverse('category-course-list', kwargs={'category': 'Computer Science'}, request=request)),
-        ('category-language-course-list', reverse('category-course-list', kwargs={'language': 'English', 'category': 'Computer Science'}, request=request)),
+        # ('category-language-course-list', reverse('category-course-list', kwargs={'language': 'English', 'category': 'Computer Science'}, request=request)),
 
         ('category-list-default', reverse('category-list', request=request)),
         ('category-list', reverse('category-list', kwargs={'language': 'English'}, request=request))
@@ -164,7 +164,6 @@ class CourseCategoryList(generics.ListAPIView):
         if language:
             lookup_params['language'] = language
 
-        print lookup_params
         return Course.objects.filter(**lookup_params)
 
 class CategoryList(generics.ListAPIView):

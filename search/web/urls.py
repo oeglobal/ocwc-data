@@ -14,7 +14,7 @@ urlpatterns = patterns('',
 	url(r'^languages/(?P<language>[\w|\W]+)/courses/$', views.CourseList.as_view(lookup_field='language'), name='language-courses-list'),
 	url(r'^languages/$', views.LanguageList.as_view({'get': 'list'}), name='language-list'),
 
-	url(r'^categories/(?P<category>[\w|\W]+)/(?P<language>[\w|\W]+)/$', views.CourseCategoryList.as_view(), name='category-course-list'),
+	# url(r'^categories/(?P<category>[\w|\W]+)/(?P<language>[\w|\W]+)/$', views.CourseCategoryList.as_view(), name='category-course-list'),
 	url(r'^categories/(?P<category>[\w|\W]+)/$', views.CourseCategoryList.as_view(), name='category-course-list'),
 	
 	
