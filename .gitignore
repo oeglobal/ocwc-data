@@ -2,3 +2,12 @@
 localsettings.py
 ./data/
 .*
+bin/
+develop-eggs/
+dumps/
+eggs/
+parts/
+solr.tar.gz
+solr/
+var/
+

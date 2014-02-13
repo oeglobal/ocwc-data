@@ -2,10 +2,11 @@ from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey, TreeManyToManyField
 
 import hashlib
+import uuid
 
 class Provider(models.Model):
     name = models.CharField(max_length=255)
-    external_id = models.TextField()
+    external_id = models.TextField(blank=True)
     active = models.BooleanField(default=True)
 
     def __unicode__(self):
@@ -14,7 +15,8 @@ class Provider(models.Model):
 SOURCE_KIND_CHOICES = (
     ('rss', 'RSS feed'),
     ('scraper', 'Gatherer scraper'),
-    ('manual', 'Manual importer')
+    ('manual', 'Manual importer'),
+    ('form', 'Online form'),
 )
 
 class Source(models.Model):
@@ -22,6 +24,13 @@ class Source(models.Model):
     kind = models.CharField(choices=SOURCE_KIND_CHOICES, default='rss', max_length=50)
     url  = models.TextField(blank=True, default='')
     update_speed = models.IntegerField(default=0, help_text='Update speed in days, 0 to disable')
+
+    edit_key = models.CharField(max_length=255, blank=True)
+
+    def save(self, force_insert=False, force_update=False, using=None):
+        if not self.edit_key:
+            self.edit_key = uuid.uuid4().get_hex()
+        super(Source, self).save(force_insert=force_insert, force_update=force_update, using=using)
 
     def __unicode__(self):
         return u"%s (%s)" % (self.provider.name, self.kind)

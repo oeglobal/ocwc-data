@@ -159,4 +159,6 @@ ALLOWED_HOSTS = ['data.ocwconsortium.org',]
 MEMBERS_API_USERNAME = ''
 MEMBERS_API_PASSWORD = ''
 
+RAVEN_CONFIG = {}
+
 from localsettings import *

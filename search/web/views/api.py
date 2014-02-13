@@ -14,7 +14,7 @@ from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 from rest_framework import viewsets, generics, mixins
 
-from .serializers import *
+from ..serializers import *
 from data.models import Course, Provider, Category
 
 @api_view(['GET'])

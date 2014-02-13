@@ -8,5 +8,5 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
 
     url(r'api/v1/', include('web.urls')),
-    url(r'^$', 'web.views.index', name='api-root'),
+    url(r'^$', 'web.views.api.index', name='api-root'),
 )
