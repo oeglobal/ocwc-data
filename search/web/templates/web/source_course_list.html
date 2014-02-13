@@ -10,16 +10,14 @@
 					<th>Title</th>
 					<th>Author</th>
 					<th>Language</th>
-					<th>Detail view</th>
 				</tr>
 			</thead>
 			<tbody>
 				{% for course in object_list %}
 				<tr>
-					<td>{{ course.title }}</td>
+					<td><a href="{% url 'dashboard:course-view' linkhash=course.linkhash %}">{{ course.title }}</a></td>
 					<td>{{ course.author }}</td>
 					<td>{{ course.language }}</td>
-					<td></td>
 				</tr>
 				{% endfor %}
 			</tbody>
