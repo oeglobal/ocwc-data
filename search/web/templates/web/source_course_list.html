@@ -1,0 +1,36 @@
+{% extends "web/base.html" %}
+
+{% block contents %}
+<div class="row">
+	<div class="small-12 columns">
+		<h1>List of courses at {{ source.provider.name }}</h1>
+		<table>
+			<thead>
+				<tr>
+					<th>Title</th>
+					<th>Author</th>
+					<th>Language</th>
+					<th>Detail view</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for course in object_list %}
+				<tr>
+					<td>{{ course.title }}</td>
+					<td>{{ course.author }}</td>
+					<td>{{ course.language }}</td>
+					<td></td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+{% if source.kind == 'form' %}
+	<div class="row">
+		<div class="small-6 columns">
+			<a href="#" class="button small">Add a Course</a>
+		</div>
+	</div>
+{% endif %}
+{% endblock %}

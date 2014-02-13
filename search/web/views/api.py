@@ -40,22 +40,22 @@ def index(request):
     """
 
     return Response(OrderedDict([
-        ('search', reverse('search-query', request=request)),
-        ('course-stats', reverse('course-stats', request=request)),
-        ('course-latest', reverse('course-latest', request=request)),
-        ('course-detail', reverse('course-detail', args=('59069fd6f629c3eefa5f8c5d6a39d96a',), request=request)),
-        ('providers-list', reverse('providers-list', request=request)),
-        ('provider-detail', reverse('provider-detail', args=('1'), request=request)),
-        ('provider-course-list', reverse('provider-courses-list', args=('1'), request=request)),
+        ('search', reverse('api:search-query', request=request)),
+        ('course-stats', reverse('api:course-stats', request=request)),
+        ('course-latest', reverse('api:course-latest', request=request)),
+        ('course-detail', reverse('api:course-detail', args=('59069fd6f629c3eefa5f8c5d6a39d96a',), request=request)),
+        ('providers-list', reverse('api:providers-list', request=request)),
+        ('provider-detail', reverse('api:provider-detail', args=('1'), request=request)),
+        ('provider-course-list', reverse('api:provider-courses-list', args=('1'), request=request)),
         
-        ('language-list', reverse('language-list', request=request)),
-        ('language-courses-list', reverse('language-courses-list', kwargs={'language': 'English'}, request=request)),
+        ('language-list', reverse('api:language-list', request=request)),
+        ('language-courses-list', reverse('api:language-courses-list', kwargs={'language': 'English'}, request=request)),
 
-        ('category-course-list', reverse('category-course-list', kwargs={'category': 'Computer Science'}, request=request)),
+        ('category-course-list', reverse('api:category-course-list', kwargs={'category': 'Computer Science'}, request=request)),
         # ('category-language-course-list', reverse('category-course-list', kwargs={'language': 'English', 'category': 'Computer Science'}, request=request)),
 
-        ('category-list-default', reverse('category-list', request=request)),
-        ('category-list', reverse('category-list', kwargs={'language': 'English'}, request=request))
+        ('category-list-default', reverse('api:category-list', request=request)),
+        ('category-list', reverse('api:category-list', kwargs={'language': 'English'}, request=request))
     ]))
 
 def search(request):

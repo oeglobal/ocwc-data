@@ -77,7 +77,6 @@ class Course(models.Model):
 
         super(Course, self).save(force_insert=force_insert, force_update=force_update, using=using)
 
-
 LOG_STATUS_CHOICES = (
     (0, 'Failed'),
     (1, 'Success')

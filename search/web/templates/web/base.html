@@ -1,0 +1,36 @@
+{% load staticfiles %}<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>{% block title %}OCW Courses Data Portal {% endblock %}</title>
+	
+	<link rel="stylesheet" type="text/css" href="{% static 'foundation/css/foundation.min.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
+    <script src="{% static 'foundation/js/vendor/modernizr.js' %}"></script>
+    
+	{% block css_head %}{% endblock %}
+  	{% block extra_head %}{% endblock %}
+</head>
+<body>
+	{% block headrow %}
+	<div class="row" id="top-row">
+		<div class="small-4 columns"><img src="{% static 'img/logo.png' %}" alt="OpenCourseWare Consortium logo" /></div>
+		<div class="small-3 columns">
+			{% if user.is_anonymous %}{% else %}
+				Logged in as <b>{{ user.username }}</b> | <a href="{% url 'admin:logout' %}">Logout</a>
+			{% endif %}
+		</div>		
+	</div>
+	{% endblock %}
+
+	<div class="main">
+		{% block contents %}{% endblock %}
+	</div>
+    
+    <script src="{% static 'foundation/js/vendor/jquery.js' %}"></script>
+    <script src="{% static 'foundation/js/foundation.min.js' %}"></script>
+    <script src="{% static 'script.js' %}"></script>
+	{% block extra_foot %}{% endblock %}
+</body>
+</html>
