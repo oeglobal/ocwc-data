@@ -1,0 +1,12 @@
+{% extends "web/base.html" %}
+
+{% block contents %}
+<div class="row">
+	<div class="small-6 columns">
+		<form method="POST" action=".">
+			{{ form }}
+			<input type="submit" value="Submit" class="button medium">
+		</form>
+	</div>
+</div>
+{% endblock %}

@@ -44,7 +44,7 @@ CONTENT_MEDIUM_CHOICES = (
 class Course(models.Model):
     title = models.TextField()
     linkhash = models.CharField(max_length=96, unique=True)
-    linkurl = models.TextField()
+    linkurl = models.TextField(verbose_name=u'URL')
 
     provider = models.ForeignKey(Provider)
     source = models.ForeignKey(Source)
