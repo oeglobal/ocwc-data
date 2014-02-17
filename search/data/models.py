@@ -1,5 +1,6 @@
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey, TreeManyToManyField
+from django.core.urlresolvers import reverse
 
 import hashlib
 import uuid
@@ -31,6 +32,9 @@ class Source(models.Model):
         if not self.edit_key:
             self.edit_key = uuid.uuid4().get_hex()
         super(Source, self).save(force_insert=force_insert, force_update=force_update, using=using)
+
+    def get_absolute_url(self):
+        return reverse('dashboard:source-course-list', kwargs={'pk':self.id})
 
     def __unicode__(self):
         return u"%s (%s)" % (self.provider.name, self.kind)

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import redirect
 
 from vanilla import ListView, DetailView, TemplateView, RedirectView, UpdateView, CreateView, FormView
 
@@ -30,12 +31,38 @@ class CourseAddView(FormView):
     form_class = CourseModelForm
     template_name = "web/course_form.html"
 
-    def get_form(self, data=None, files=None, **kwargs):
-        edit_key = self.kwargs.pop('edit_key')
+    def dispatch(self, request, *args, **kwargs):
+        edit_key = kwargs.pop('edit_key')
         
-        if Source.objects.filter(edit_key=edit_key).exists():
-            kwargs['edit_key'] = edit_key
-        else:
+        try:
+            self.source = Source.objects.get(edit_key=edit_key)
+        except Source.DoesNotExist:
             raise PermissionDenied
 
+        return super(CourseAddView, self).dispatch(request, *args, **kwargs)
+
+    def get_form(self, data=None, files=None, **kwargs):
+        kwargs['source'] = self.source
         return self.form_class(data, files, **kwargs)
+
+    def form_valid(self, form):
+        cleaned_data = form.cleaned_data
+        
+        cleaned_data['source'] = self.source
+        cleaned_data['provider'] = self.source.provider
+
+        categories = cleaned_data.pop('categories')
+
+        course = Course(**cleaned_data)
+        course.save()
+
+        for cat in categories:
+            course.categories.add(cat)
+
+        return redirect(self.source.get_absolute_url())
+
+    def get_context_data(self, **kwargs):
+        context = super(CourseAddView, self).get_context_data(**kwargs)
+        context['source'] = self.source
+
+        return context

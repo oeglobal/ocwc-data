@@ -100,6 +100,10 @@ INSTALLED_APPS = (
     'rest_framework',
     'mptt',
 
+    'crispy_forms',
+    'crispy_forms_foundation',
+    'django_select2',
+
     'search',
     'south',
     'data',
@@ -160,5 +164,8 @@ MEMBERS_API_USERNAME = ''
 MEMBERS_API_PASSWORD = ''
 
 RAVEN_CONFIG = {}
+
+CRISPY_TEMPLATE_PACK = 'foundation'
+AUTO_RENDER_SELECT2_STATICS = False
 
 from localsettings import *

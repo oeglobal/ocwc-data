@@ -1,12 +1,20 @@
-{% extends "web/base.html" %}
+{% extends "web/base.html" %}{% load crispy_forms_tags django_select2_tags staticfiles %}
+
+{% block css_head %}
+	{% import_django_select2_css 1 %}
+	<style type="text/css" src="{% static 'select2-foundation5.css' %}"></style>
+{% endblock %}
+{% block footer_js %}{% import_django_select2_js 1 %}{% endblock %}
 
 {% block contents %}
+
+
+
 <div class="row">
-	<div class="small-6 columns">
-		<form method="POST" action=".">
-			{{ form }}
-			<input type="submit" value="Submit" class="button medium">
-		</form>
+	<h2>Add new Course to <strong>{{ source.provider.name }}</strong></h2>
+
+	<div class="small-10 columns">
+		{% crispy form %}
 	</div>
 </div>
 {% endblock %}

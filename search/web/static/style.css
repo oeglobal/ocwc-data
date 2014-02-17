@@ -5,3 +5,11 @@
 .main {
 	margin-top: 2em;
 }
+
+form .buttons {
+	padding-top: 1em;
+}
+
+form .select2-container.select2-container-multi {
+	width: 100%;
+}

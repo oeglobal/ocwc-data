@@ -18,7 +18,7 @@
 			<dd>{{ course.language|default:'N/A' }}</dd>
 			<dt>Categories</dt>
 			{% if course.categories.all %}
-				<dd>{{ course.categories.all|join:',' }}</dd>
+				<dd>{{ course.categories.all|join:', ' }}</dd>
 			{% else %}
 				<dd>N/A</dd>
 			{% endif %}
