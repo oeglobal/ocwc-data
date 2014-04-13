@@ -7,8 +7,8 @@ LANG_MAPPING = {
         'en-us': 'english',
         u'ingl\xe9s': u'english',
     
-    'Catalan': 'catalan',
-        'ca': 'catalan',
+    # 'Catalan': 'catalan',
+    #     'ca': 'catalan',
     
     'Chinese': 'chinese',
         'Chineset': 'chinese',
