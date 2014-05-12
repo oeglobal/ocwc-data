@@ -28,4 +28,15 @@
 			<dd>{{ course.get_content_medium_display }}</dd>
 		</dl>
 	</div>
+
+<div class="row">
+	<div class="small-3 columns">
+		<a href="{% url 'dashboard:course-edit' course.id %}" class="button small">Edit</a>
+	</div>
+	{% if course.get_next %}
+		<div class="small-3 columns right">
+			<a href="{% url 'dashboard:course-view' linkhash=course.get_next.linkhash %}" class="button small">Next</a>
+		</div>
+	{% endif %}
+</div>
 {% endblock %}

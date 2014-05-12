@@ -2,11 +2,12 @@
 from django import forms
 
 from crispy_forms.helper import FormHelper
-from crispy_forms_foundation.layout import Submit, Layout, Field, Div, HTML, Row
+from crispy_forms_foundation.layout import Submit, Layout, Field, Row
 
 import django_select2
 
-from data.models import Course, Source, LANGUAGE_CHOICES
+from data.models import Course, LANGUAGE_CHOICES
+
 
 class CourseModelForm(forms.ModelForm):
 
@@ -16,9 +17,9 @@ class CourseModelForm(forms.ModelForm):
         else:
             source = kwargs.pop('source')
             self.base_fields['source'].initial = source.id
-            self.base_fields['source'].widget = forms.HiddenInput()
             self.base_fields['language'].initial = 'English'
 
+        self.base_fields['source'].widget = forms.HiddenInput()
         self.base_fields['categories'].widget = django_select2.widgets.Select2MultipleWidget()
         self.base_fields['categories'].help_text = "Press Esc key to close the selection box after you've selected all relevant categories."
 

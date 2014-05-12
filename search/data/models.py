@@ -106,6 +106,12 @@ class Course(models.Model):
 
         super(Course, self).save(force_insert=force_insert, force_update=force_update, using=using)
 
+    def get_next(self):
+        try:
+            return Course.objects.filter(source=self.source, id__gt=self.pk).order_by('id')[0]
+        except IndexError:
+            pass
+
 LOG_STATUS_CHOICES = (
     (0, 'Failed'),
     (1, 'Success')
