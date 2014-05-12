@@ -41,8 +41,33 @@ class Source(models.Model):
 
 CONTENT_MEDIUM_CHOICES = (
     ('text', 'Text'),
+    ('textbook', 'Textbook'),
     ('video', 'Video'),
     ('audio', 'Audio')
+)
+
+LANGUAGE_CHOICES = (
+    ('Catalan', 'Catalan'),
+    ('Chinese', 'Chinese'),
+    ('Dutch', 'Dutch'),
+    ('English', 'English'),
+    ('Finnish', 'Finnish'),
+    ('French', 'French'),
+    ('Galician', 'Galician'),
+    ('German', 'German'),
+    ('Hebrew', 'Hebrew'),
+    ('Indonesian', 'Indonesian'),
+    ('Italian', 'Italian'),
+    ('Japanese', 'Japanese'),
+    ('Korean', 'Korean'),
+    ('Malay', 'Malay'),
+    ('Persian', 'Persian'),
+    ('Polish', 'Polish'),
+    ('Portuguese', 'Portuguese'),
+    ('Russian', 'Russian'),
+    ('Slovenian', 'Slovenian'),
+    ('Spanish', 'Spanish'),
+    ('Turkish', 'Turkish'),
 )
 
 class Course(models.Model):
@@ -56,7 +81,7 @@ class Course(models.Model):
     description = models.TextField()
     tags = models.TextField()
 
-    language = models.CharField(max_length=300)
+    language = models.CharField(max_length=300, choices=LANGUAGE_CHOICES)
     author = models.CharField(max_length=765, default='')
     rights = models.TextField(default='')
     contributors = models.CharField(max_length=765, blank=True, default='')
@@ -66,7 +91,7 @@ class Course(models.Model):
     date_indexed = models.DateTimeField(auto_now=True)
     date_modified = models.DateTimeField(auto_now=True)
 
-    content_medium = models.CharField(max_length=100, choices=CONTENT_MEDIUM_CHOICES, default='text')
+    content_medium = models.CharField(max_length=100, choices=CONTENT_MEDIUM_CHOICES, default='text', verbose_name=u'Content type')
 
     translated_text = models.TextField(blank=True)
     calais_socialtags = models.TextField(blank=True)

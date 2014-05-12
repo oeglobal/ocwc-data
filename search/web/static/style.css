@@ -10,6 +10,17 @@ form .buttons {
 	padding-top: 1em;
 }
 
-form .select2-container.select2-container-multi {
+form .select2-container.select2-container-multi,
+form .select2-container.select2widget {
 	width: 100%;
+	margin-bottom: 1em;
+}
+
+#id_description {
+	height: 8em;
+}
+
+form .formHint {
+	margin-top: -0.5em;
+	margin-bottom: 1em;
 }
