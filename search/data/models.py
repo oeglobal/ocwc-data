@@ -100,8 +100,8 @@ class Course(models.Model):
 
     categories = TreeManyToManyField('Category', blank=True, null=True)
 
-    def save(self, force_insert=False, force_update=False, using=None):
-        if not self.linkhash:
+    def save(self, update_linkhash=False, force_insert=False, force_update=False, using=None):
+        if not self.linkhash or update_linkhash:
             self.linkhash = hashlib.md5(self.linkurl.encode('utf-8')).hexdigest()
 
         super(Course, self).save(force_insert=force_insert, force_update=force_update, using=using)
