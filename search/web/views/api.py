@@ -22,7 +22,7 @@ def index(request):
     """
     This is experimental Open Data API to Courses that are currently tracked by OpenCourseWare Consortium.
 
-    We are currently setting first version of API endpoints as we transition to this system. Please note that 
+    We are currently setting first version of API endpoints as we transition to this system. Please note that
     API endpoints and/or return values might change at any time. We plan to finalize first version by the end of 2013.
 
     This API currently directly powers [OCWC course search][search].
@@ -34,7 +34,7 @@ def index(request):
     If you would just like a copy of the data, you can download Excel export [from here][dbdump].
 
     [jure]: mailto:jure@ocwconsortium.org
-    [search]: http://www.ocwconsortium.org/en/courses/search
+    [search]: http://www.oeconsortium.org/courses/
     [github]: https://github.com/ocwc/ocwc-data
     [dbdump]: http://data.ocwconsortium.org/dbdump/
     """
