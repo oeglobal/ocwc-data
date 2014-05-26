@@ -158,7 +158,7 @@ LOGGING = {
 
 SOLR_URL = "http://localhost:8984/solr/%s/"
 
-ALLOWED_HOSTS = ['data.ocwconsortium.org',]
+ALLOWED_HOSTS = ['data.ocwconsortium.org', 'data.oeconsortium.org']
 
 MEMBERS_API_USERNAME = ''
 MEMBERS_API_PASSWORD = ''

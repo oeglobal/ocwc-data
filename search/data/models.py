@@ -100,6 +100,9 @@ class Course(models.Model):
 
     categories = TreeManyToManyField('Category', blank=True, null=True)
 
+    merlot_present = models.BooleanField(default=False)
+    merlot_synced = models.BooleanField(default=False)
+
     def save(self, update_linkhash=False, force_insert=False, force_update=False, using=None):
         if not self.linkhash or update_linkhash:
             self.linkhash = hashlib.md5(self.linkurl.encode('utf-8')).hexdigest()
