@@ -20,7 +20,8 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        requests_cache.install_cache('merlot')
+        if settings.DEBUG:
+            requests_cache.install_cache('merlot')
 
         if options.get("subdomain_search"):
             self.subdomain_search(url=options.get("subdomain_search"))
