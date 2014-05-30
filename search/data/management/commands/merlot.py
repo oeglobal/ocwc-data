@@ -30,7 +30,7 @@ class Command(BaseCommand):
             self.import_categories()
 
     def subdomain_search(self, url):
-        print '-------- MERLOT -------'
+        print '-------- Present in MERLOT but missing in OEConsortium -------'
         params = {
             'licenseKey': settings.MERLOT_KEY,
             'page': 1,
@@ -39,7 +39,7 @@ class Command(BaseCommand):
 
         while True:
             r = requests.get(settings.MERLOT_API_URL + '/materialsAdvanced.rest', params=params)
-            
+
             tree = ET.fromstring(r.content)
             
             num_results = int(tree.find('nummaterialstotal').text)
@@ -58,8 +58,8 @@ class Command(BaseCommand):
                 break
 
     def local_subdomain_search(self, url):
-        print '----- OEConsortium ------'
-        for course in Course.objects.filter(linkurl__icontains=url, merlot_present=False):
+        print '----- Missing in MERLOT but present in OEConsortium ------'
+        for course in Course.objects.filter(linkurl__icontains=url, merlot_present=False, merlot_ignore=False):
             print course.linkurl
 
     def _locate_local_url(self, url):

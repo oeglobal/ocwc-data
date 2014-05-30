@@ -23,6 +23,8 @@ class CourseModelForm(forms.ModelForm):
         self.base_fields['categories'].widget = django_select2.widgets.Select2MultipleWidget()
         self.base_fields['categories'].help_text = "Press Esc key to close the selection box after you've selected all relevant categories."
 
+        self.base_fields['merlot_categories'].widget = django_select2.widgets.Select2MultipleWidget()
+
         self.base_fields['language'].widget = django_select2.widgets.Select2Widget(choices=LANGUAGE_CHOICES)
         self.base_fields['tags'].help_text = "Separate tags with commas"
 
@@ -31,6 +33,7 @@ class CourseModelForm(forms.ModelForm):
 
         self.helper.layout = Layout(
             Row(
+                Field('merlot_ignore'),
                 Field('title'),
                 Field('linkurl'),
                 Field('description'),
@@ -39,6 +42,7 @@ class CourseModelForm(forms.ModelForm):
                 Field('author'),
                 Field('tags'),
                 Field('categories'),
+                Field('merlot_categories'),
             ),
             Row(
                 Submit('Save', 'save'),
@@ -49,4 +53,5 @@ class CourseModelForm(forms.ModelForm):
 
     class Meta:
         model = Course
-        fields = ('title', 'linkurl', 'source', 'description', 'language', 'author', 'categories', 'tags', 'content_medium')
+        fields = ('title', 'linkurl', 'source', 'description', 'language', 'author', 'categories', 'merlot_categories',
+                  'tags', 'content_medium', 'merlot_ignore')

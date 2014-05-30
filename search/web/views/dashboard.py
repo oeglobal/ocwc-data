@@ -66,12 +66,16 @@ class CourseFormAddView(CourseActionMixin, FormView):
         cleaned_data['provider'] = self.source.provider
 
         categories = cleaned_data.pop('categories')
+        merlot_categories = cleaned_data.pop('merlot_categories')
 
         course = Course(**cleaned_data)
         course.save()
 
         for cat in categories:
             course.categories.add(cat)
+
+        for cat in merlot_categories:
+            course.merlot_categories.add(cat)
 
         return redirect(self.source.get_absolute_url())
 
@@ -100,6 +104,7 @@ class CourseFormEditView(CourseActionMixin, FormView):
         cleaned_data['provider'] = course.source.provider
 
         categories = cleaned_data.pop('categories')
+        merlot_categories = cleaned_data.pop('merlot_categories')
 
         for key in cleaned_data:
             setattr(course, key, cleaned_data.get(key))
@@ -108,5 +113,9 @@ class CourseFormEditView(CourseActionMixin, FormView):
         course.categories.clear()
         for cat in categories:
             course.categories.add(cat)
+
+        course.merlot_categories.clear()
+        for cat in merlot_categories:
+            course.merlot_categories.add(cat)
 
         return redirect(reverse('dashboard:course-view', kwargs={'linkhash': course.linkhash}))

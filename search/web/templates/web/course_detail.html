@@ -1,4 +1,4 @@
-{% extends "web/base.html" %}
+{% extends "web/base.html" %}{% load mptt_tags %}
 
 {% block contents %}
 <div class="row">
@@ -22,6 +22,16 @@
 			{% else %}
 				<dd>N/A</dd>
 			{% endif %}
+			<dt>MERLOT Categories</dt>
+			{% if course.merlot_categories.all %}
+				<dd>
+					{% for node in course.merlot_categories.all %}
+						{{ node.get_ancestors|tree_path:" > " }} > {{ node }}<br />
+					{% endfor %}
+				</dd>
+			{% else %}
+				<dd>N/A</dd>
+			{% endif %}			
 			<dt>Published</dt>
 			<dd>{{ course.date_published }}</dd>
 			<dt>Content Medium</dt>

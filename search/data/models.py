@@ -102,8 +102,10 @@ class Course(models.Model):
 
     merlot_present = models.BooleanField(default=False)
     merlot_synced = models.BooleanField(default=False)
+    merlot_ignore = models.BooleanField(default=False)
 
     merlot_categories = TreeManyToManyField('MerlotCategory', blank=True, null=True)
+    merlot_url = models.TextField(blank=True, default='')
 
     def save(self, update_linkhash=False, force_insert=False, force_update=False, using=None):
         if not self.linkhash or update_linkhash:

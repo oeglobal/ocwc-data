@@ -7,6 +7,7 @@
 		<table>
 			<thead>
 				<tr>
+					<th>Merlot</th>
 					<th>Title</th>
 					<th>Author</th>
 					<th>Language</th>
@@ -15,6 +16,15 @@
 			<tbody>
 				{% for course in object_list %}
 				<tr>
+					{% if course.merlot_ignore %}
+						<td>ign</td>
+					{% elif course.merlot_present %}
+						<td>pre</td>
+					{% elif course.merlot_synced %}
+						<td>sync</td>
+					{% else %}
+						<td><a href="{% url 'dashboard:course-edit' course.id %}" class="button tiny" style="margin-bottom: 0;">edit</a></td>
+					{% endif %}
 					<td><a href="{% url 'dashboard:course-view' linkhash=course.linkhash %}">{{ course.title }}</a></td>
 					<td>{{ course.author }}</td>
 					<td>{{ course.language }}</td>
