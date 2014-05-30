@@ -10,4 +10,4 @@ parts/
 solr.tar.gz
 solr/
 var/
-
+*.sqlite

@@ -103,6 +103,8 @@ class Course(models.Model):
     merlot_present = models.BooleanField(default=False)
     merlot_synced = models.BooleanField(default=False)
 
+    merlot_categories = TreeManyToManyField('MerlotCategory', blank=True, null=True)
+
     def save(self, update_linkhash=False, force_insert=False, force_update=False, using=None):
         if not self.linkhash or update_linkhash:
             self.linkhash = hashlib.md5(self.linkurl.encode('utf-8')).hexdigest()
@@ -119,7 +121,6 @@ LOG_STATUS_CHOICES = (
     (0, 'Failed'),
     (1, 'Success')
 )
-
 class Log(models.Model):
     source = models.ForeignKey(Source)
     date = models.DateTimeField(auto_now_add=True)
@@ -128,8 +129,21 @@ class Log(models.Model):
     processed_courses = models.ManyToManyField(Course, related_name='processed_courses')
     new_courses = models.ManyToManyField(Course, related_name='new_courses')
 
+
 class Category(MPTTModel):
     name = models.CharField(max_length=50, unique=True)
+    parent = TreeForeignKey('self', null=True, blank=True, related_name='children')
+
+    class MPTTMeta:
+        order_insertion_by = ['name']
+
+    def __unicode__(self):
+        return self.name
+
+
+class MerlotCategory(MPTTModel):
+    name = models.CharField(max_length=150)
+    merlot_id = models.IntegerField()
     parent = TreeForeignKey('self', null=True, blank=True, related_name='children')
 
     class MPTTMeta:
