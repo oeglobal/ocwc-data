@@ -2,7 +2,7 @@
 from django import forms
 
 from crispy_forms.helper import FormHelper
-from crispy_forms_foundation.layout import Submit, Layout, Field, Row
+from crispy_forms_foundation.layout import Submit, Layout, Field, Row, HTML
 
 import django_select2
 
@@ -13,15 +13,16 @@ class CourseModelForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         if kwargs.get('instance'):
-            pass
+            self.instance = kwargs.get('instance')
         else:
             source = kwargs.pop('source')
             self.base_fields['source'].initial = source.id
             self.base_fields['language'].initial = 'English'
+            self.instance = None
 
         self.base_fields['source'].widget = forms.HiddenInput()
-        self.base_fields['categories'].widget = django_select2.widgets.Select2MultipleWidget()
-        self.base_fields['categories'].help_text = "Press Esc key to close the selection box after you've selected all relevant categories."
+        # self.base_fields['categories'].widget = django_select2.widgets.Select2MultipleWidget()
+        # self.base_fields['categories'].help_text = "Press Esc key to close the selection box after you've selected all relevant categories."
 
         self.base_fields['merlot_categories'].widget = django_select2.widgets.Select2MultipleWidget()
 
@@ -41,9 +42,32 @@ class CourseModelForm(forms.ModelForm):
                 Field('content_medium'),
                 Field('author'),
                 Field('tags'),
-                Field('categories'),
-                Field('merlot_categories'),
             ),
+        )
+
+        if self.instance and self.instance.categories:
+            self.helper.layout.append(Layout(
+                Row(
+                    HTML("<h4>Legacy categories:</h4>"),
+                    HTML(
+                    """ {%load mptt_tags %}
+                        <p>
+                        {% for node in course.categories.all %}
+                        {{ node.get_ancestors|tree_path:" > " }} > {{ node }}<br />
+                        {% endfor %}
+                        </p>
+                    """)
+                ))
+            )
+
+        self.helper.layout.append(Layout(
+            Row(
+                HTML("<a href='http://www.merlot.org/merlot/categories.htm' target='_blank'>Full Merlot Categories list</a>"),
+                Field('merlot_categories'),
+            )
+        ))
+
+        self.helper.layout.append(
             Row(
                 Submit('Save', 'save'),
             css_class="buttons")
@@ -53,5 +77,5 @@ class CourseModelForm(forms.ModelForm):
 
     class Meta:
         model = Course
-        fields = ('title', 'linkurl', 'source', 'description', 'language', 'author', 'categories', 'merlot_categories',
+        fields = ('title', 'linkurl', 'source', 'description', 'language', 'author', 'merlot_categories',
                   'tags', 'content_medium', 'merlot_ignore')

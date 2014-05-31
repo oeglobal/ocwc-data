@@ -65,14 +65,14 @@ class CourseFormAddView(CourseActionMixin, FormView):
         cleaned_data['source'] = self.source
         cleaned_data['provider'] = self.source.provider
 
-        categories = cleaned_data.pop('categories')
+        # categories = cleaned_data.pop('categories')
         merlot_categories = cleaned_data.pop('merlot_categories')
 
         course = Course(**cleaned_data)
         course.save()
 
-        for cat in categories:
-            course.categories.add(cat)
+        # for cat in categories:
+        #     course.categories.add(cat)
 
         for cat in merlot_categories:
             course.merlot_categories.add(cat)
@@ -95,6 +95,12 @@ class CourseFormEditView(CourseActionMixin, FormView):
         kwargs['instance'] = self.instance
         return self.form_class(data, files, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = super(CourseFormEditView, self).get_context_data(**kwargs)
+        context['course'] = self.instance
+
+        return context
+
     def form_valid(self, form):
         course = self.instance
 
@@ -103,16 +109,16 @@ class CourseFormEditView(CourseActionMixin, FormView):
         cleaned_data['source'] = course.source
         cleaned_data['provider'] = course.source.provider
 
-        categories = cleaned_data.pop('categories')
+        # categories = cleaned_data.pop('categories')
         merlot_categories = cleaned_data.pop('merlot_categories')
 
         for key in cleaned_data:
             setattr(course, key, cleaned_data.get(key))
         course.save(update_linkhash=True)
 
-        course.categories.clear()
-        for cat in categories:
-            course.categories.add(cat)
+        # course.categories.clear()
+        # for cat in categories:
+        #     course.categories.add(cat)
 
         course.merlot_categories.clear()
         for cat in merlot_categories:
