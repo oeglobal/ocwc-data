@@ -40,14 +40,32 @@ class CourseModelForm(forms.ModelForm):
             Row(
                 Field('merlot_ignore'),
                 Field('title'),
-                Field('linkurl'),
+            )
+        )
+
+        if self.instance and self.instance.linkurl:
+            self.helper.layout.append(Layout(
+                Row(
+                    HTML("<a href='%s' target='_blank'>View link</a>" % self.instance.linkurl),
+                    Field('linkurl'),
+                    )
+            ))
+        else:
+            self.helper.layout.append(Layout(
+                Row(
+                    Field('linkurl')
+                )
+            ))
+
+        self.helper.layout.append(Layout(
+            Row(
                 Field('description'),
                 Field('language'),
                 Field('content_medium'),
                 Field('author'),
                 Field('tags'),
-            ),
-        )
+            )
+        ))
 
         if self.instance and self.instance.categories.count():
             self.helper.layout.append(Layout(
