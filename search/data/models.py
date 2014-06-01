@@ -1,6 +1,7 @@
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey, TreeManyToManyField
 from django.core.urlresolvers import reverse
+from django.utils.encoding import force_unicode
 
 import hashlib
 import uuid
@@ -70,6 +71,29 @@ LANGUAGE_CHOICES = (
     ('Turkish', 'Turkish'),
 )
 
+PRIMARY_AUDIENCE_CHOICES = (
+    (1, 'Grade School'),
+    (2, 'Middle School'),
+    (3, 'High School'),
+    (4, 'College General Ed'),
+    (5, 'College Lower Division'),
+    (6, 'College Upper Division'),
+    (7, 'Graduate School'),
+    (8, 'Professional'),
+)
+
+YES_NO_UNSURE_CHOICES = (
+    ('Yes', 'Yes'),
+    ('No', 'No'),
+    ('Unsure', 'Unsure')
+)
+
+CC_DERIV_CHOICES = (
+    ('Yes', 'Yes'),
+    ('No', 'No'),
+    ('Sa', 'Share-Alike')
+)
+
 class Course(models.Model):
     title = models.TextField()
     linkhash = models.CharField(max_length=96, unique=True)
@@ -107,6 +131,14 @@ class Course(models.Model):
     merlot_categories = TreeManyToManyField('MerlotCategory', blank=True, null=True)
     merlot_url = models.TextField(blank=True, default='')
 
+    image_url = models.TextField(blank=True, default='')
+    audience = models.IntegerField(null=True, choices=PRIMARY_AUDIENCE_CHOICES)
+    creative_commons = models.CharField(max_length=30, choices=YES_NO_UNSURE_CHOICES, default='Unsure', verbose_name=u'Is CC Licenesed?')
+    creative_commons_commercial = models.CharField(max_length=30, blank=True, choices=YES_NO_UNSURE_CHOICES, default='',
+                                                verbose_name=u'Is CC Commercial allowed?')
+    creative_commons_derivatives = models.CharField(max_length=30, blank=True, choices=CC_DERIV_CHOICES, default='',
+                                                verbose_name=u'Is CC Derative work allowed or Share-Alike?')
+
     def save(self, update_linkhash=False, force_insert=False, force_update=False, using=None):
         if not self.linkhash or update_linkhash:
             self.linkhash = hashlib.md5(self.linkurl.encode('utf-8')).hexdigest()
@@ -119,10 +151,19 @@ class Course(models.Model):
         except IndexError:
             pass
 
+    def get_merlot_categories(self):
+        paths = []
+        for cat in self.merlot_categories.all():
+            paths.append(u'/'.join(force_unicode(i) for i in list(cat.get_ancestors()) + [cat]))
+
+        return ','.join(paths)
+
 LOG_STATUS_CHOICES = (
     (0, 'Failed'),
     (1, 'Success')
 )
+
+
 class Log(models.Model):
     source = models.ForeignKey(Source)
     date = models.DateTimeField(auto_now_add=True)

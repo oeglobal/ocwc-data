@@ -1,14 +1,39 @@
 # -*- coding: utf-8 -*-
+import xlwt
 import requests
 import requests_cache
 import xml.etree.ElementTree as ET
 from optparse import make_option
+from collections import OrderedDict
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
 from data.models import Course, MerlotCategory
 
+MERLOT_LANGUAGES = {
+    'English': 1,
+    'Arabic': 2,
+    'Chinese': 3,
+    'Czech': 4,
+    'Danish': 5,
+    'Dutch': 6,
+    'French': 7,
+    'German': 8,
+    'Greek': 9,
+    'Hebrew': 10,
+    'Icelandic ': 11,
+    'Italian': 12,
+    'Japanese': 13,
+    'Korean': 14,
+    'Latin': 15,
+    'Portuguese ': 16,
+    'Russian': 17,
+    'Spanish': 18,
+    'Swedish': 19,
+    'Turkish': 20,
+    'Vietnamese': 21,
+}
 
 class Command(BaseCommand):
     help = "Utilities to merge our database with MERLOT"
@@ -16,7 +41,9 @@ class Command(BaseCommand):
 
     option_list = BaseCommand.option_list + (
         make_option("--subdomain-search", action="store", dest="subdomain_search", help="Searches arbitrary subdomain"),
-        make_option("--import-categories", action="store_true", dest="import_categories", help="Imports Categories")
+        make_option("--import-categories", action="store_true", dest="import_categories", help="Imports Categories"),
+        make_option("--export", action="store", dest="export_source", help="Export Source ID to Excel"),
+        make_option("-f", action="store", dest="filename", help="Target filename")
     )
 
     def handle(self, *args, **options):
@@ -28,6 +55,8 @@ class Command(BaseCommand):
             self.local_subdomain_search(url=options.get("subdomain_search"))
         elif options.get("import_categories"):
             self.import_categories()
+        elif options.get("export_source"):
+            self.export(source_id=options.get("export_source"), filename=options.get("filename"))
 
     def subdomain_search(self, url):
         print '-------- Present in MERLOT but missing in OEConsortium -------'
@@ -105,3 +134,80 @@ class Command(BaseCommand):
 
         tree = ET.fromstring(r.content)
         _get_children(tree, 0)
+
+    def export(self, source_id, filename):
+        wbk = xlwt.Workbook()
+        sheet = wbk.add_sheet('Courses')
+
+        first_row = OrderedDict([
+            ('Title', 10),           # 0
+            ('URL', 18),             # 1
+            ('Mirror URL', 18),      # 2
+            ('Description', 10),     # 3
+            ('Image URL', 10),       # 4
+            ('Material Type', 10),   # 5
+            ('Audience', 10),        # 6
+            ('Mobile OS Compatibility', 10),  # 7
+            ('Material Version', 10),  # 8
+            ('Technical Format', 10),   # 9
+            ('Technical Requirements', 10),  # 10
+            ('Source Code Available', 10),   # 11
+            ('Accessibility Information Available', 10),  # 12
+            ('Cost Involved', 10),    # 13
+            ('Copyright', 10),        # 14
+            ('Languages', 10),        # 15
+            ('Category paths', 10),   # 16
+            ('Submitter Username', 10),  # 17
+            ('Author Username', 10),  # 18
+            ('Author Name', 10),      # 19
+            ('Author Email', 10),     # 20
+            ('Author Org', 10),       # 21
+            ('Creative Commons License: yes/no/unsure', 10),  # 22
+            ('CC Commercial', 10),    # 23
+            ('CC Derivatives', 10),   # 24
+            ('Keywords', 10)          # 25
+        ])
+
+        r = c = 0
+
+        for item in first_row:
+            sheet.write(r, c, item)
+            sheet.col(c).width = first_row[item] * 1000
+            c += 1
+        r += 1
+
+        for course in Course.objects.filter(source_id=source_id, merlot_present=False, merlot_ignore=False):
+            sheet.write(r, 0, course.title)
+            sheet.write(r, 1, course.linkurl)
+            # 2 empty - mirror url
+            sheet.write(r, 3, course.description)
+            sheet.write(r, 4, course.image_url)
+            sheet.write(r, 5, 9)  # 9 - Online Course
+            sheet.write(r, 6, 4)  # 4 - College General Ed
+            # 7 - Mobile OS - empty
+            # 8 - Material Version - empty
+            if course.content_medium == 'video':
+                sheet.write(r, 9, 20)  # 10 - Video
+            else:
+                sheet.write(r, 9, 10)  # 10 - HTML/Text
+            # 10 - Technical requirements
+            sheet.write(r, 11, 'Unsure')  # 11 - Source Code
+            sheet.write(r, 12, 'Unsure')  # 12 - Accessibility
+            sheet.write(r, 13, 'Unsure')  # 13 - Cost
+            # 14 - Copyright
+            sheet.write(r, 15, MERLOT_LANGUAGES[course.language])  # 15 - Language
+            sheet.write(r, 16, course.get_merlot_categories())  # 16 - Category
+            sheet.write(r, 17, 'oeconsortium')  # 17 - Submitter username
+            # 18 - Author username
+            sheet.write(r, 19, course.author)  # 19 - Author name
+            # 19 - Author Email
+            # 20 - Author Org
+            sheet.write(r, 22, course.creative_commons)
+            sheet.write(r, 23, course.creative_commons_commercial)
+            sheet.write(r, 24, course.creative_commons_derivatives)
+            sheet.write(r, 25, course.tags.replace(', ', ','))  # 25 - Keywords
+
+            r += 1
+        wbk.save(filename)
+
+        self.stdout.write("Wrote %s courses to %s" % (r, filename))

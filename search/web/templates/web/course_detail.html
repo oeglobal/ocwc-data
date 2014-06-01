@@ -36,6 +36,16 @@
 			<dd>{{ course.date_published }}</dd>
 			<dt>Content Medium</dt>
 			<dd>{{ course.get_content_medium_display }}</dd>
+			<dt>Image URL</dt>
+			<dd>{{ course.image_url }}</dd>
+			<dt>Audience</dt>
+			<dd>{{ course.get_audience_display }}</dd>
+			<dt>Creative Commons</dt>
+			<dd>{{ course.get_creative_commons_display }}</dd>
+			<dt>Creative Commons Commercial use allowed</dt>
+			<dd>{{ course.get_creative_commons_commercial_display }}</dd>
+			<dt>Creative Commons Derivates allowed</dt>
+			<dd>{{ course.get_creative_commons_derivatives_display }}</dd>
 		</dl>
 	</div>
 
