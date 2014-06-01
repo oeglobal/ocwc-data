@@ -23,7 +23,11 @@
 					{% elif course.merlot_synced %}
 						<td>sync</td>
 					{% else %}
-						<td><a href="{% url 'dashboard:course-edit' course.id %}" class="button tiny" style="margin-bottom: 0;">edit</a></td>
+						{% if course.merlot_categories %}
+							<td><a href="{% url 'dashboard:course-edit' course.id %}" class="button tiny" style="margin-bottom: 0;">edit</a></td>
+						{% else %}
+							<td><a href="{% url 'dashboard:course-edit' course.id %}" class="button alert tiny" style="margin-bottom: 0;">edit</a></td>
+						{% endif %}
 					{% endif %}
 					<td><a href="{% url 'dashboard:course-view' linkhash=course.linkhash %}">{{ course.title }}</a></td>
 					<td>{{ course.author }}</td>
