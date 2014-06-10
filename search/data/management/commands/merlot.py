@@ -44,7 +44,8 @@ class Command(BaseCommand):
         make_option("--subdomain-search", action="store", dest="subdomain_search", help="Searches arbitrary subdomain"),
         make_option("--import-categories", action="store_true", dest="import_categories", help="Imports Categories"),
         make_option("--export", action="store", dest="export_source", help="Export Source ID to Excel"),
-        make_option("-f", action="store", dest="filename", help="Target filename")
+        make_option("-f", action="store", dest="filename", help="Target filename"),
+        make_option("--linkcheck", action="store", dest="link_check_source", help="Target Source ID to check for 404")
     )
 
     def handle(self, *args, **options):
@@ -58,6 +59,8 @@ class Command(BaseCommand):
             self.import_categories()
         elif options.get("export_source"):
             self.export(source_id=options.get("export_source"), filename=options.get("filename"))
+        elif options.get("link_check_source"):
+            self.link_check(source_id=options.get("link_check_source"))
 
     def subdomain_search(self, url):
         print '-------- Present in MERLOT but missing in OEConsortium -------'
@@ -89,13 +92,13 @@ class Command(BaseCommand):
 
     def local_subdomain_search(self, url):
         print '----- Missing in MERLOT but present in OEConsortium ------'
-        for course in Course.objects.filter(linkurl__icontains=url, merlot_present=False, merlot_ignore=False):
+        for course in Course.objects.filter(linkurl__icontains=url, merlot_present=False, merlot_ignore=False, is_404=False):
             print course.linkurl
 
     def _locate_local_url(self, url):
         def __lookup_source(slug, source_id):
             try:
-                course = Course.objects.get(linkurl__icontains=slug, source=source_id)
+                course = Course.objects.get(linkurl__icontains=slug, source=source_id, is_404=False)
                 if not course.merlot_present:
                     course.merlot_present = True
                     course.save()
@@ -106,7 +109,7 @@ class Command(BaseCommand):
             except Course.MultipleObjectsReturned:
                 print "     -------"
                 print "Too many results", url, slug
-                for i in Course.objects.filter(linkurl__icontains=slug, source=source_id):
+                for i in Course.objects.filter(linkurl__icontains=slug, source=source_id, is_404=False):
                     print i.id
                 raise
 
@@ -207,7 +210,7 @@ class Command(BaseCommand):
             c += 1
         r += 1
 
-        for course in Course.objects.filter(source_id=source_id, merlot_present=False, merlot_ignore=False):
+        for course in Course.objects.filter(source_id=source_id, merlot_present=False, merlot_ignore=False, is_404=False):
             sheet.write(r, 0, course.title)
             sheet.write(r, 1, course.linkurl)
             # 2 empty - mirror url
@@ -251,3 +254,13 @@ class Command(BaseCommand):
         wbk.save(filename)
 
         self.stdout.write("Wrote %s courses to %s" % (r, filename))
+
+    def link_check(self, source_id):
+        for course in Course.objects.filter(source_id=source_id, is_404=False):
+            print course.linkurl
+            r = requests.get(course.linkurl, allow_redirects=True)
+            if r.status_code == 404:
+                print '404!'
+                course.is_404 = True
+                course.save()
+

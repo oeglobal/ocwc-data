@@ -139,6 +139,8 @@ class Course(models.Model):
     creative_commons_derivatives = models.CharField(max_length=30, blank=True, choices=CC_DERIV_CHOICES, default='',
                                                 verbose_name=u'Is CC Derative work allowed or Share-Alike?')
 
+    is_404 = models.BooleanField(default=False)
+
     def save(self, update_linkhash=False, force_insert=False, force_update=False, using=None):
         if not self.linkhash or update_linkhash:
             self.linkhash = hashlib.md5(self.linkurl.encode('utf-8')).hexdigest()
