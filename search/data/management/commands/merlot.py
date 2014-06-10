@@ -5,6 +5,7 @@ import requests_cache
 import xml.etree.ElementTree as ET
 from optparse import make_option
 from collections import OrderedDict
+from urlparse import urlsplit
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
@@ -76,7 +77,7 @@ class Command(BaseCommand):
             if num_results > 0:
                 for material in tree.findall('material'):
                     url = material.find('URL').text
-                    print material.find('URL').text, '\t\t\t', material.find('detailURL').text
+                    print '#######', material.find('URL').text, '\t\t\t', material.find('detailURL').text
                     self._locate_local_url(url)
 
                 if params['page'] * 10 > num_results:
@@ -92,23 +93,53 @@ class Command(BaseCommand):
             print course.linkurl
 
     def _locate_local_url(self, url):
+        def __lookup_source(slug, source_id):
+            try:
+                course = Course.objects.get(linkurl__icontains=slug, source=source_id)
+                if not course.merlot_present:
+                    course.merlot_present = True
+                    course.save()
+                return course
+            except Course.DoesNotExist:
+                print "Missing:", url, slug
+                return
+            except Course.MultipleObjectsReturned:
+                print "     -------"
+                print "Too many results", url, slug
+                for i in Course.objects.filter(linkurl__icontains=slug, source=source_id):
+                    print i.id
+                raise
+
         # Source: 8 - Johns Hopkins Bloomberg School of Public Health
         if url.startswith('http://ocw.jhsph.edu/'):
             slug = url.replace('http://ocw.jhsph.edu/courses', '').replace('/index.cfm', '')
             if slug[-1] != '/':
                 slug += '/'
+            return __lookup_source(slug, 8)
+        
+        # Source: 13 - Massachusetts Institute of Technology
+        if url.startswith('http://ocw.mit.edu/'):
+            if url.endswith('.htm'):
+                r = requests.get(url, allow_redirects=True)
+                url = r.url
 
-            try:
-                course = Course.objects.get(linkurl__icontains=slug, source=8)
-                if not course.merlot_present:
-                    course.merlot_present = True
-                    course.save()
-            except Course.DoesNotExist:
-                print "Missing:", url, slug
+            IGNORE_URLS = [
+                'http://ocw.mit.edu/courses/physics/',
+                'http://ocw.mit.edu/',
+                'http://ocw.mit.edu',
+                'http://ocw.mit.edu/courses/sloan-school-of-management/'
+            ]
+            if url in IGNORE_URLS:
                 return
-            except Course.MultipleObjectsReturned:
-                print "Too many results", url, slug
-                return
+
+            IGNORE_FOLDERS = ['', 'textbook', 'proj', 'readings', 'sloan-school-of-management', 'projects']
+            path = urlsplit(url).path.split('/')
+            while path[-1] in IGNORE_FOLDERS:
+                path.remove(path[-1])
+
+            slug = path[-1]
+            print ':::::', url, slug, url.split('/')[-1]
+            return __lookup_source(slug, 13)
 
     def import_categories(self):
         def _get_children(parent_category, depth=0):

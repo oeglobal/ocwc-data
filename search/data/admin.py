@@ -6,8 +6,8 @@ from .models import *
 
 class CourseAdmin(admin.ModelAdmin):
     list_display = ('title', 'language', 'provider', 'calais_socialtags', 'calais_topics')
-    list_filter = ('language', 'provider')
-    search_fields = ('title', 'description')
+    list_filter = ('language', 'provider', 'merlot_present')
+    search_fields = ('title', 'description', 'linkurl')
 
 
 class SourceAdmin(admin.ModelAdmin):
