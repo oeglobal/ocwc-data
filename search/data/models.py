@@ -154,9 +154,8 @@ class Course(models.Model):
     def get_merlot_categories(self):
         paths = []
         for cat in self.merlot_categories.all():
-            paths.append(u'/'.join(force_unicode(i) for i in list(cat.get_ancestors()) + [cat]))
-
-        return ','.join(paths)
+            paths.append(u'/'.join(force_unicode(i) for i in (['All'] + list(cat.get_ancestors()) + [cat])))
+        return ';'.join(paths)
 
 LOG_STATUS_CHOICES = (
     (0, 'Failed'),

@@ -76,7 +76,7 @@ class Command(BaseCommand):
             if num_results > 0:
                 for material in tree.findall('material'):
                     url = material.find('URL').text
-                    # print material.find('URL').text, '\t\t\t', material.find('detailURL').text
+                    print material.find('URL').text, '\t\t\t', material.find('detailURL').text
                     self._locate_local_url(url)
 
                 if params['page'] * 10 > num_results:
@@ -199,13 +199,22 @@ class Command(BaseCommand):
             sheet.write(r, 16, course.get_merlot_categories())  # 16 - Category
             sheet.write(r, 17, 'oeconsortium')  # 17 - Submitter username
             # 18 - Author username
-            sheet.write(r, 19, course.author)  # 19 - Author name
+            authors = u';'.join(course.author.replace(', ', ',').split(','))
+            sheet.write(r, 19, authors)  # 19 - Author name
             # 19 - Author Email
             # 20 - Author Org
             sheet.write(r, 22, course.creative_commons)
-            sheet.write(r, 23, course.creative_commons_commercial)
+            if course.creative_commons_commercial == 'No':
+                cc_commercial = 'false'
+            elif course.creative_commons_commercial == 'Yes':
+                cc_commercial = 'true'
+            else:
+                cc_commercial = ''
+            sheet.write(r, 23, cc_commercial)
             sheet.write(r, 24, course.creative_commons_derivatives)
-            sheet.write(r, 25, course.tags.replace(', ', ','))  # 25 - Keywords
+
+            tags = u';'.join(course.tags.replace(', ', ',').split(',') + ['oec', 'ocwc'])
+            sheet.write(r, 25, tags)  # 25 - Keywords
 
             r += 1
         wbk.save(filename)
