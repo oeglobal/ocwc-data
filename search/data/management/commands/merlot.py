@@ -3,12 +3,16 @@ import xlwt
 import requests
 import requests_cache
 import xml.etree.ElementTree as ET
+import lxml.html
+from lxml.cssselect import CSSSelector
 from optparse import make_option
 from collections import OrderedDict
-from urlparse import urlsplit
+from urlparse import urlsplit, parse_qs
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
+
+from ...category_mappings import mit_to_merlot_category
 
 from data.models import Course, MerlotCategory
 
@@ -36,6 +40,7 @@ MERLOT_LANGUAGES = {
     'Vietnamese': 21,
 }
 
+
 class Command(BaseCommand):
     help = "Utilities to merge our database with MERLOT"
     args = ""
@@ -45,7 +50,8 @@ class Command(BaseCommand):
         make_option("--import-categories", action="store_true", dest="import_categories", help="Imports Categories"),
         make_option("--export", action="store", dest="export_source", help="Export Source ID to Excel"),
         make_option("-f", action="store", dest="filename", help="Target filename"),
-        make_option("--linkcheck", action="store", dest="link_check_source", help="Target Source ID to check for 404")
+        make_option("--linkcheck", action="store", dest="link_check_source", help="Target Source ID to check for 404"),
+        make_option("--categorize", action="store", dest="categorize_source", help="Categorizes Source ID")
     )
 
     def handle(self, *args, **options):
@@ -53,7 +59,7 @@ class Command(BaseCommand):
             requests_cache.install_cache('merlot')
 
         if options.get("subdomain_search"):
-            self.subdomain_search(url=options.get("subdomain_search"))
+            # self.subdomain_search(url=options.get("subdomain_search"))
             self.local_subdomain_search(url=options.get("subdomain_search"))
         elif options.get("import_categories"):
             self.import_categories()
@@ -61,6 +67,8 @@ class Command(BaseCommand):
             self.export(source_id=options.get("export_source"), filename=options.get("filename"))
         elif options.get("link_check_source"):
             self.link_check(source_id=options.get("link_check_source"))
+        elif options.get("categorize_source"):
+            self.categorize_source(source_id=options.get("categorize_source"))
 
     def subdomain_search(self, url):
         print '-------- Present in MERLOT but missing in OEConsortium -------'
@@ -80,7 +88,6 @@ class Command(BaseCommand):
             if num_results > 0:
                 for material in tree.findall('material'):
                     url = material.find('URL').text
-                    print '#######', material.find('URL').text, '\t\t\t', material.find('detailURL').text
                     self._locate_local_url(url)
 
                 if params['page'] * 10 > num_results:
@@ -91,9 +98,61 @@ class Command(BaseCommand):
                 break
 
     def local_subdomain_search(self, url):
+        def _map_mit_categories(mit_categories):
+            cats = []
+            for url in mit_categories:
+                qs = parse_qs(url.split('#')[1])
+                cat = mit_to_merlot_category(cat=qs.get('cat'), subcat=qs.get('subcat'), spec=qs.get('spec'))
+                cats.append(MerlotCategory.objects.get(merlot_id=cat))
+            return cats
+
+        def _import_mit_course(course):
+            # print course.linkurl
+            # Download Course URL from MIT
+
+            r = requests.get(course.linkurl)
+            sel = CSSSelector('#related ul li a')
+            h = lxml.html.document_fromstring(r.content)
+            mit_categories = []
+            for el in sel(h):
+                if el.get('href').startswith('/courses/find-by-topic/'):
+                    mit_categories.append(el.get('href'))
+
+            # Map Category
+            for cat in _map_mit_categories(mit_categories):
+                if cat not in course.merlot_categories.all():
+                    course.merlot_categories.add(cat)
+                    course.save()
+            
+            # Fix Authors and Description
+            sel = CSSSelector('[itemprop="author"]')
+            authors = []
+            for el in sel(h):
+                authors.append(el.text.strip())
+            course.author = ', '.join(authors)
+            
+            sel = CSSSelector('[itemprop="image"]')
+            for el in sel(h):
+                course.image_url = 'http://ocw.mit.edu/' + el.get('src')
+
+            sel = CSSSelector('meta[name="keywords"]')
+            for el in sel(h):
+                course.tags = el.get('content')
+            
+            # Set licensing metadata
+            course.audience = 4
+            course.creative_commons = 'Yes'
+            course.creative_commons_commercial = 'No'
+            course.creative_commons_derivatives = 'Sa'
+            course.save()
+
         print '----- Missing in MERLOT but present in OEConsortium ------'
         for course in Course.objects.filter(linkurl__icontains=url, merlot_present=False, merlot_ignore=False, is_404=False):
-            print course.linkurl
+            if course.source.id == 13:
+                _import_mit_course(course)
+                # break
+            else:
+                print course.linkurl
 
     def _locate_local_url(self, url):
         def __lookup_source(slug, source_id):
@@ -141,8 +200,57 @@ class Command(BaseCommand):
                 path.remove(path[-1])
 
             slug = path[-1]
-            print ':::::', url, slug, url.split('/')[-1]
+            
             return __lookup_source(slug, 13)
+
+    def categorize_source(self, source_id):
+        if source_id == '13':
+            CATEGORY_MAPPING = {
+                # MIT slug : MERLOT ID
+                'aeronautics-and-astronautics': 2652,
+                'anthropology': 2788, 
+                'architecture': 525655,
+                'athletics-physical-education-and-recreation': 2290,
+                'biological-engineering': 2653, 
+                'biology': 2608,
+                'brain-and-cognitive-sciences': 2812,
+                'chemical-engineering': 2655,
+                'chemistry': 2623,
+                'civil-and-environmental-engineering': 2656,
+                'comparative-media-studies': 525645,
+                'comparative-media-studies-writing': 525645,
+                'concourse': 2438,
+                'earth-atmospheric-and-planetary-sciences': 396338,
+                'economics': 2216,
+                # 'electrical-engineering-and-computer-science': 
+                'engineering-systems-division': 2663,
+                # 'experimental-study-group': 
+                # 'foreign-languages-and-literatures': 
+                'health-sciences-and-technology': 2654,
+                'history': 2329,
+                'linguistics-and-philosophy': 2438,
+                'literature': 2434,
+                'materials-science-and-engineering': 2665,
+                # 'mathematics': 
+                'mechanical-engineering': 2666,
+                # 'media-arts-and-sciences': 
+                # 'music-and-theater-arts': 
+                'nuclear-engineering': 2668,
+                # 'physics': 
+                'political-science': 2805,
+                'science-technology-and-society': 2605,
+                # 'sloan-school-of-management': 
+                # 'special-programs': 
+                'urban-studies-and-planning': 451172,
+                'womens-and-gender-studies': 525651,
+                # 'writing-and-humanistic-studies': 
+            }
+
+            
+
+            for course in Course.objects.filter(source__id=source_id, merlot_present=False, merlot_ignore=False, is_404=False):
+                path = course.linkurl.replace('http://ocw.mit.edu/courses/', '')
+                print path.split('/')[0]
 
     def import_categories(self):
         def _get_children(parent_category, depth=0):
@@ -247,7 +355,12 @@ class Command(BaseCommand):
             sheet.write(r, 23, cc_commercial)
             sheet.write(r, 24, course.creative_commons_derivatives)
 
-            tags = u';'.join(course.tags.replace(', ', ',').split(',') + ['oec', 'ocwc'])
+            tags = course.tags.strip().replace(', ', ',').split(',')
+            tags = list(filter((lambda x: x != ''), tags))
+            if tags:
+                tags = u';'.join(tags + ['oec', 'ocwc'])
+            else: 
+                tags = u';'.join(['oec', 'ocwc'])
             sheet.write(r, 25, tags)  # 25 - Keywords
 
             r += 1

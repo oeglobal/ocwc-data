@@ -27,9 +27,9 @@ class ProviderAdmin(admin.ModelAdmin):
 
 
 class MerlotCategoryAdmin(MPTTModelAdmin):
-    list_display = ('name', 'parent')
+    list_display = ('name', 'parent', 'merlot_id')
     search_fields = ('name',)
-
+    list_per_page = 1200
 
 admin.site.register(Provider, ProviderAdmin)
 admin.site.register(Source, SourceAdmin)
