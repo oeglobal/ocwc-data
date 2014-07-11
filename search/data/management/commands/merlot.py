@@ -59,7 +59,7 @@ class Command(BaseCommand):
             requests_cache.install_cache('merlot')
 
         if options.get("subdomain_search"):
-            # self.subdomain_search(url=options.get("subdomain_search"))
+            self.subdomain_search(url=options.get("subdomain_search"))
             self.local_subdomain_search(url=options.get("subdomain_search"))
         elif options.get("import_categories"):
             self.import_categories()

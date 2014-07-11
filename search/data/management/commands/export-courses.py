@@ -57,20 +57,19 @@ class Command(BaseCommand):
                 for course in source.course_set.all():
 
                     sheet.write(r, 0, link % course.linkhash)
-                    sheet.write(r, 1, course.linkhash )
-                    sheet.write(r, 2, course.linkurl )
-                    sheet.write(r, 3, provider.name )
-                    sheet.write(r, 4, course.language )
-                    sheet.write(r, 5, course.tags )
-                    sheet.write(r, 6, course.author )
-                    sheet.write(r, 7, course.title )
-                    sheet.write(r, 8, course.description )
+                    sheet.write(r, 1, course.linkhash)
+                    sheet.write(r, 2, course.linkurl)
+                    sheet.write(r, 3, provider.name)
+                    sheet.write(r, 4, course.language)
+                    sheet.write(r, 5, course.tags)
+                    sheet.write(r, 6, course.author)
+                    sheet.write(r, 7, course.title)
+                    sheet.write(r, 8, course.description[:32760])
                     sheet.write(r, 9, course.date_published, style)
-                    sheet.write(r, 10, course.date_indexed,   style)
-                    sheet.write(r, 11, course.date_modified,  style)
+                    sheet.write(r, 10, course.date_indexed, style)
+                    sheet.write(r, 11, course.date_modified, style)
 
                     r += 1
 
         wbk.save(xls_filename)
-
         self.stdout.write("Wrote %s courses to %s" % (r, xls_filename))

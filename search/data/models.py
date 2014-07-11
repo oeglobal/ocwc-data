@@ -103,7 +103,7 @@ class Course(models.Model):
     source = models.ForeignKey(Source)
     
     description = models.TextField()
-    tags = models.TextField()
+    tags = models.TextField(blank=True)
 
     language = models.CharField(max_length=300, choices=LANGUAGE_CHOICES)
     author = models.CharField(max_length=765, default='')

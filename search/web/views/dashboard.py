@@ -16,7 +16,7 @@ class SourceCourseListView(ListView):
 
     def get_queryset(self):
         pk = self.kwargs.get('pk')
-        return self.model.objects.filter(source=pk).order_by('id')
+        return self.model.objects.filter(source=pk, merlot_present=False, is_404=False).order_by('-merlot_categories')
 
     def get_context_data(self, **kwargs):
         context = super(SourceCourseListView, self).get_context_data(**kwargs)
