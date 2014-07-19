@@ -171,7 +171,7 @@ class Command(BaseCommand):
                         o = urlsplit(course.linkurl)
                         course.image_url = "%s://%s/" % (o.scheme, o.hostname) + el.get('src')
 
-                    print "\tset image_url to", course.image_url
+                    # print "\tset image_url to", course.image_url
                     r = requests.get(course.image_url, allow_redirects=True)
                     if r.status_code == 404:
                         print '404', course.image_url
