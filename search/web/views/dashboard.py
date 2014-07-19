@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import HTMLParser
+
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
@@ -108,6 +110,9 @@ class CourseFormEditView(CourseActionMixin, FormView):
 
         cleaned_data['source'] = course.source
         cleaned_data['provider'] = course.source.provider
+
+        h = HTMLParser.HTMLParser()
+        cleaned_data['description'] = h.unescape(cleaned_data['description'])
 
         # categories = cleaned_data.pop('categories')
         merlot_categories = cleaned_data.pop('merlot_categories')
