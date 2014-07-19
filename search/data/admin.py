@@ -5,7 +5,7 @@ from .models import *
 
 
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('title', 'language', 'provider', 'calais_socialtags', 'calais_topics')
+    list_display = ('title', 'language', 'provider', 'merlot_present', 'is_404')
     list_filter = ('language', 'provider', 'merlot_present', 'is_404')
     search_fields = ('title', 'description', 'linkurl')
 

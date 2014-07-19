@@ -14,7 +14,7 @@ from django.conf import settings
 
 from ...category_mappings import mit_to_merlot_category
 
-from data.models import Course, MerlotCategory
+from data.models import Source, Course, MerlotCategory
 
 MERLOT_LANGUAGES = {
     'English': 1,
@@ -32,12 +32,14 @@ MERLOT_LANGUAGES = {
     'Japanese': 13,
     'Korean': 14,
     'Latin': 15,
-    'Portuguese ': 16,
+    'Portuguese': 16,
     'Russian': 17,
     'Spanish': 18,
     'Swedish': 19,
     'Turkish': 20,
     'Vietnamese': 21,
+
+    'Catalan': 'Catalan',
 }
 
 
@@ -59,6 +61,7 @@ class Command(BaseCommand):
             requests_cache.install_cache('merlot')
 
         if options.get("subdomain_search"):
+            self.subdomain_search(url=options.get("subdomain_search"), print_all_urls=True)
             self.subdomain_search(url=options.get("subdomain_search"))
             self.local_subdomain_search(url=options.get("subdomain_search"))
         elif options.get("import_categories"):
@@ -67,11 +70,15 @@ class Command(BaseCommand):
             self.export(source_id=options.get("export_source"), filename=options.get("filename"))
         elif options.get("link_check_source"):
             self.link_check(source_id=options.get("link_check_source"))
-        elif options.get("categorize_source"):
-            self.categorize_source(source_id=options.get("categorize_source"))
+        # elif options.get("categorize_source"):
+        #     self.categorize_source(source_id=options.get("categorize_source"))
 
-    def subdomain_search(self, url):
-        print '-------- Present in MERLOT but missing in OEConsortium -------'
+    def subdomain_search(self, url, print_all_urls=False):
+        if print_all_urls:
+            print '-------- List of all MERLOT urls -------'
+        else:
+            print '-------- Present in MERLOT but missing in OEConsortium -------'
+
         params = {
             'licenseKey': settings.MERLOT_KEY,
             'page': 1,
@@ -82,13 +89,16 @@ class Command(BaseCommand):
             r = requests.get(settings.MERLOT_API_URL + '/materialsAdvanced.rest', params=params)
 
             tree = ET.fromstring(r.content)
-            
             num_results = int(tree.find('nummaterialstotal').text)
 
             if num_results > 0:
                 for material in tree.findall('material'):
                     url = material.find('URL').text
-                    self._locate_local_url(url)
+
+                    if print_all_urls:
+                        print url
+                    else:
+                        self._locate_local_url(url)
 
                 if params['page'] * 10 > num_results:
                     break
@@ -155,9 +165,14 @@ class Command(BaseCommand):
                 print course.linkurl
 
     def _locate_local_url(self, url):
-        def __lookup_source(slug, source_id):
+        def __lookup_source(slug, source_id, lookup_type='icontaints'):
+            lookup_args = {
+                'linkurl__' + lookup_type: slug,
+                'source': source_id,
+                'is_404': False
+            }
             try:
-                course = Course.objects.get(linkurl__icontains=slug, source=source_id, is_404=False)
+                course = Course.objects.get(**lookup_args)
                 if not course.merlot_present:
                     course.merlot_present = True
                     course.save()
@@ -168,7 +183,7 @@ class Command(BaseCommand):
             except Course.MultipleObjectsReturned:
                 print "     -------"
                 print "Too many results", url, slug
-                for i in Course.objects.filter(linkurl__icontains=slug, source=source_id, is_404=False):
+                for i in Course.objects.filter(**lookup_args):
                     print i.id
                 raise
 
@@ -203,54 +218,12 @@ class Command(BaseCommand):
             
             return __lookup_source(slug, 13)
 
-    def categorize_source(self, source_id):
-        if source_id == '13':
-            CATEGORY_MAPPING = {
-                # MIT slug : MERLOT ID
-                'aeronautics-and-astronautics': 2652,
-                'anthropology': 2788, 
-                'architecture': 525655,
-                'athletics-physical-education-and-recreation': 2290,
-                'biological-engineering': 2653, 
-                'biology': 2608,
-                'brain-and-cognitive-sciences': 2812,
-                'chemical-engineering': 2655,
-                'chemistry': 2623,
-                'civil-and-environmental-engineering': 2656,
-                'comparative-media-studies': 525645,
-                'comparative-media-studies-writing': 525645,
-                'concourse': 2438,
-                'earth-atmospheric-and-planetary-sciences': 396338,
-                'economics': 2216,
-                # 'electrical-engineering-and-computer-science': 
-                'engineering-systems-division': 2663,
-                # 'experimental-study-group': 
-                # 'foreign-languages-and-literatures': 
-                'health-sciences-and-technology': 2654,
-                'history': 2329,
-                'linguistics-and-philosophy': 2438,
-                'literature': 2434,
-                'materials-science-and-engineering': 2665,
-                # 'mathematics': 
-                'mechanical-engineering': 2666,
-                # 'media-arts-and-sciences': 
-                # 'music-and-theater-arts': 
-                'nuclear-engineering': 2668,
-                # 'physics': 
-                'political-science': 2805,
-                'science-technology-and-society': 2605,
-                # 'sloan-school-of-management': 
-                # 'special-programs': 
-                'urban-studies-and-planning': 451172,
-                'womens-and-gender-studies': 525651,
-                # 'writing-and-humanistic-studies': 
-            }
+        # Source: 59 - University of Notre Dame
+        if url.startswith("http://ocw.nd.edu/"):
+            path = urlsplit(url).path.split('/')
+            slug = path[-1]
 
-            
-
-            for course in Course.objects.filter(source__id=source_id, merlot_present=False, merlot_ignore=False, is_404=False):
-                path = course.linkurl.replace('http://ocw.mit.edu/courses/', '')
-                print path.split('/')[0]
+            return __lookup_source(slug, 59, lookup_type='iendswith')
 
     def import_categories(self):
         def _get_children(parent_category, depth=0):
@@ -322,7 +295,7 @@ class Command(BaseCommand):
             sheet.write(r, 0, course.title)
             sheet.write(r, 1, course.linkurl)
             # 2 empty - mirror url
-            sheet.write(r, 3, course.description)
+            sheet.write(r, 3, course.description[:32767])
             sheet.write(r, 4, course.image_url)
             sheet.write(r, 5, 9)  # 9 - Online Course
             sheet.write(r, 6, 4)  # 4 - College General Ed
@@ -359,7 +332,7 @@ class Command(BaseCommand):
             tags = list(filter((lambda x: x != ''), tags))
             if tags:
                 tags = u';'.join(tags + ['oec', 'ocwc'])
-            else: 
+            else:
                 tags = u';'.join(['oec', 'ocwc'])
             sheet.write(r, 25, tags)  # 25 - Keywords
 
@@ -369,11 +342,13 @@ class Command(BaseCommand):
         self.stdout.write("Wrote %s courses to %s" % (r, filename))
 
     def link_check(self, source_id):
-        for course in Course.objects.filter(source_id=source_id, is_404=False):
+        source = Source.objects.get(pk=source_id)
+        print '404 links for %s' % source.provider.name
+        for course in Course.objects.filter(source=source, is_404=False):
             print course.linkurl
             r = requests.get(course.linkurl, allow_redirects=True)
             if r.status_code == 404:
-                print '404!'
+                print '\t', course.linkurl
                 course.is_404 = True
                 course.save()
 
