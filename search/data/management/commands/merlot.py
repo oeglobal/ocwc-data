@@ -158,13 +158,25 @@ class Command(BaseCommand):
             course.creative_commons_derivatives = 'Sa'
             course.save()
 
+        def _set_image_url(course, source_id):
+            r = requests.get(course.linkurl)
+            h = lxml.html.document_fromstring(r.content)
+
+            if source_id == 59:
+                sel = CSSSelector('#aboutPhoto .image-inline')
+                for el in sel(h):
+                    course.image_url = el.get('src')
+                    print "set image_url to", course.image_url
+                    course.save()
+
         print '----- Missing in MERLOT but present in OEConsortium ------'
         for course in Course.objects.filter(linkurl__icontains=url, merlot_present=False, merlot_ignore=False, is_404=False):
             if course.source.id == 13:
                 _import_mit_course(course)
-                # break
-            else:
-                print course.linkurl
+            elif course.source.id == 59:
+                _set_image_url(course, source_id=course.source.id)
+
+            print course.linkurl
 
     def _locate_local_url(self, url):
         def __lookup_source(slug, source_id, lookup_type='icontaints'):
