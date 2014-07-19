@@ -94,6 +94,7 @@ CC_DERIV_CHOICES = (
     ('Sa', 'Share-Alike')
 )
 
+
 class Course(models.Model):
     title = models.TextField()
     linkhash = models.CharField(max_length=96, unique=True)
@@ -133,7 +134,7 @@ class Course(models.Model):
 
     image_url = models.TextField(blank=True, default='')
     audience = models.IntegerField(null=True, choices=PRIMARY_AUDIENCE_CHOICES)
-    creative_commons = models.CharField(max_length=30, choices=YES_NO_UNSURE_CHOICES, default='Unsure', verbose_name=u'Is CC Licenesed?')
+    creative_commons = models.CharField(max_length=30, choices=YES_NO_UNSURE_CHOICES, default='Unsure', verbose_name=u'Is CC Licensed?')
     creative_commons_commercial = models.CharField(max_length=30, blank=True, choices=YES_NO_UNSURE_CHOICES, default='',
                                                 verbose_name=u'Is CC Commercial allowed?')
     creative_commons_derivatives = models.CharField(max_length=30, blank=True, choices=CC_DERIV_CHOICES, default='',

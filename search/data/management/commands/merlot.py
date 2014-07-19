@@ -53,7 +53,9 @@ class Command(BaseCommand):
         make_option("--export", action="store", dest="export_source", help="Export Source ID to Excel"),
         make_option("-f", action="store", dest="filename", help="Target filename"),
         make_option("--linkcheck", action="store", dest="link_check_source", help="Target Source ID to check for 404"),
-        make_option("--categorize", action="store", dest="categorize_source", help="Categorizes Source ID")
+        make_option("--categorize", action="store", dest="categorize_source", help="Categorizes Source ID"),
+        make_option("--license", action="store", dest="license", help="Set MERLOT license to whole source, e.g. cc-by-nc-sa"),
+        make_option("--source", action="store", dest="source_id", help="Source ID")
     )
 
     def handle(self, *args, **options):
@@ -70,8 +72,8 @@ class Command(BaseCommand):
             self.export(source_id=options.get("export_source"), filename=options.get("filename"))
         elif options.get("link_check_source"):
             self.link_check(source_id=options.get("link_check_source"))
-        # elif options.get("categorize_source"):
-        #     self.categorize_source(source_id=options.get("categorize_source"))
+        elif options.get("license"):
+            self.set_license(license_raw=options.get("license"), source_id=options.get("source_id"))
 
     def subdomain_search(self, url, print_all_urls=False):
         if print_all_urls:
@@ -352,3 +354,28 @@ class Command(BaseCommand):
                 course.is_404 = True
                 course.save()
 
+    def set_license(self, license_raw, source_id):
+        source = Source.objects.get(pk=source_id)
+
+        parsed = license_raw.split('-')
+        print 'Setting license to', parsed
+
+        for course in Course.objects.filter(source=source, is_404=False):
+            if 'cc' in parsed:
+                course.creative_commons = 'Yes'
+            if 'nc' in parsed:
+                course.creative_commons_commercial = 'No'
+            else:
+                course.creative_commons_commercial = 'Yes'
+
+            if 'nd' in parsed:
+                course.creative_commons_derivatives = 'No'
+            elif 'sa' in parsed:
+                course.creative_commons_derivatives = 'Sa'
+            else:
+                course.creative_commons_derivatives = 'Yes'
+
+            if not course.audience:
+                course.audience = 4
+
+            course.save()
