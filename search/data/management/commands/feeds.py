@@ -54,6 +54,12 @@ class Command(BaseCommand):
             else:
                 link = entry.id
                 linkhash = hashlib.md5(link.encode('utf-8')).hexdigest()
+
+                try:
+                    rights = entry.rights
+                except AttributeError:
+                    rights = ''
+
                 course, created = Course.objects.get_or_create(
                     linkhash = linkhash,
                     linkurl = link,
@@ -64,7 +70,7 @@ class Command(BaseCommand):
                         'source': source,
                         'language': 'English',
                         'author': entry.author,
-                        'rights': entry.rights,
+                        'rights': rights,
                         'date_published': entry.updated_parsed,
                         'date_indexed': entry.updated_parsed,
                         'date_modified': entry.updated_parsed
