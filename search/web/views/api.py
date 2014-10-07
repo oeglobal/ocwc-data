@@ -116,7 +116,7 @@ class ProviderCourseList(generics.ListAPIView):
     List all available Courses for Provider
     """
     def get_queryset(self):
-        return Course.objects.filter(**self.kwargs)
+        return Course.objects.filter(**self.kwargs).order_by('title')
     serializer_class = CourseListSerializer
     paginate_by = 25
     paginate_by_param = 'limit'    
