@@ -90,6 +90,7 @@ class Command(BaseCommand):
         while True:
             r = requests.get(settings.MERLOT_API_URL + '/materialsAdvanced.rest', params=params)
 
+            print r.content
             tree = ET.fromstring(r.content)
             num_results = int(tree.find('nummaterialstotal').text)
 
@@ -322,7 +323,7 @@ class Command(BaseCommand):
             sheet.write(r, 3, course.description[:32767])
             sheet.write(r, 4, course.image_url)
             sheet.write(r, 5, 9)  # 9 - Online Course
-            sheet.write(r, 6, 4)  # 4 - College General Ed
+            sheet.write(r, 6, '4,5,6') # 4 - College General Ed, 5 - College Lower Division, 6 - College Upper Division
             # 7 - Mobile OS - empty
             # 8 - Material Version - empty
             if course.content_medium == 'video':
