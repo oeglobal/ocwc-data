@@ -12,12 +12,20 @@ class CourseListSerializer(serializers.ModelSerializer):
 
 class CourseSerializer(serializers.ModelSerializer):
     provider_name = serializers.CharField(source='provider.name')
-    categories = serializers.RelatedField(many=True)
+    categories = serializers.RelatedField(source='merlot_categories', many=True)
 
     class Meta:
         model = Course
         fields = ('linkhash', 'title', 'description', 'tags', 'provider', 'provider_name', 'language',
                   'date_published', 'id', 'linkurl', 'author', 'categories')
+
+    def transform_categories(self, obj, value):
+        # import ipdb; ipdb.set_trace()
+        cat_tree = []
+        for cat in obj.merlot_categories.all():
+            cat_tree.append('/'.join( ['All'] + map( unicode, cat.get_ancestors() ) + [cat.name] ) )
+
+        return cat_tree
 
 
 class ProviderSerializer(serializers.ModelSerializer):

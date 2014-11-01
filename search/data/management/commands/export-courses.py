@@ -30,16 +30,17 @@ class Command(BaseCommand):
         first_row = OrderedDict([
             ('OCW Link', 18000),    # 0
             ('URL Hash', 8000),     # 1
-            ('Link', 20000),         # 2
+            ('Link', 20000),        # 2
             ('Provider', 8000),     # 3
             ('Language', 5000),     # 4
             ('Tags', 8000),         # 5
             ('Author', 8000),       # 6
-            ('Title', 10000),        # 7
-            ('Description', 10000),  # 8
+            ('Title', 10000),       # 7
+            ('Description', 10000), # 8
             ('Published', 5000),    # 9
             ('Indexed', 5000),      # 10
-            ('Modified', 5000)      # 11
+            ('Modified', 5000),     # 11
+            ('Categories', 10000)   # 12
         ])
 
         r = c = 0
@@ -68,6 +69,11 @@ class Command(BaseCommand):
                     sheet.write(r, 9, course.date_published, style)
                     sheet.write(r, 10, course.date_indexed, style)
                     sheet.write(r, 11, course.date_modified, style)
+
+                    cat_tree = []
+                    for cat in course.merlot_categories.all():
+                        cat_tree.append('/'.join( ['All'] + map( unicode, cat.get_ancestors() ) + [cat.name] ) )
+                    sheet.write(r, 12, ';'.join(cat_tree))
 
                     r += 1
 

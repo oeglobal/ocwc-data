@@ -5,6 +5,7 @@ import requests
 import requests_cache
 import xml.etree.ElementTree as ET
 import lxml.html
+from lxml import etree
 from lxml.cssselect import CSSSelector
 from optparse import make_option
 from collections import OrderedDict
@@ -47,7 +48,10 @@ MERLOT_LANGUAGE_SHORT = {
     'eng': 'English',
     'jpn': 'Japanese',
     'spa': 'Spanish',
-    'fre': 'French'
+    'fre': 'French',
+    'ara': 'Arabic',
+    'heb': 'Hebrew',
+    'dum': 'Dutch'
 }
 
 
@@ -432,6 +436,8 @@ class Command(BaseCommand):
             'merlot_synced': True,
         }
 
+        print course_data['merlot_xml']
+
         language = ''
         for language_short in material.find('languages').findall('language'):
             language = MERLOT_LANGUAGE_SHORT[language_short.text]
@@ -476,7 +482,6 @@ class Command(BaseCommand):
         # course.merlot_categories.clear()
         for category in material.find('categories').findall('category'):
             category_id = category.attrib.get('href').split('=')[1]
-            print(category.text, category_id)
             course.merlot_categories.add(MerlotCategory.objects.get(merlot_id=category_id))
 
 
@@ -494,11 +499,13 @@ class Command(BaseCommand):
                 'url': domain
             }
 
+            parser = etree.XMLParser(recover=True)
             while True:
                 r = requests.get(settings.MERLOT_API_URL + '/materialsAdvanced.rest', params=params)
-
+                print('\n\n---------------------------------\n\n')
                 print(r.content)
-                tree = ET.fromstring(r.content)
+
+                tree = ET.fromstring(r.content, parser=parser)
                 num_results = int(tree.find('nummaterialstotal').text)
 
                 if num_results > 0:

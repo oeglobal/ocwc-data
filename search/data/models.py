@@ -108,7 +108,7 @@ class Course(models.Model):
 
     language = models.CharField(max_length=300, choices=LANGUAGE_CHOICES)
     author = models.CharField(max_length=765, default='')
-    rights = models.TextField(default='')
+    rights = models.TextField(default='', blank=True)
     contributors = models.CharField(max_length=765, blank=True, default='')
     license = models.TextField(blank=True, default='')
     
@@ -130,7 +130,7 @@ class Course(models.Model):
     merlot_synced_date = models.DateTimeField(null=True)
     merlot_id = models.IntegerField(null=True)
     merlot_ignore = models.BooleanField(default=False)
-    merlot_material_type = models.CharField(max_length=100, default='')
+    merlot_material_type = models.CharField(max_length=100, default='', blank=True)
 
     merlot_categories = TreeManyToManyField('MerlotCategory', blank=True, null=True)
     merlot_url = models.TextField(blank=True, default='')

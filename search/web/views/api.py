@@ -43,7 +43,7 @@ def index(request):
         ('search', reverse('api:search-query', request=request)),
         ('course-stats', reverse('api:course-stats', request=request)),
         ('course-latest', reverse('api:course-latest', request=request)),
-        ('course-detail', reverse('api:course-detail', args=('59069fd6f629c3eefa5f8c5d6a39d96a',), request=request)),
+        ('course-detail', reverse('api:course-detail', args=('5fa03a5c8db7311b6c3e3235dc616ae0',), request=request)),
         ('providers-list', reverse('api:providers-list', request=request)),
         ('provider-detail', reverse('api:provider-detail', args=('1'), request=request)),
         ('provider-course-list', reverse('api:provider-courses-list', args=('1'), request=request)),
