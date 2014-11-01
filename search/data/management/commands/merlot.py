@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import xlwt
+import datetime
 import requests
 import requests_cache
 import xml.etree.ElementTree as ET
@@ -42,6 +43,13 @@ MERLOT_LANGUAGES = {
     'Catalan': 'Catalan',
 }
 
+MERLOT_LANGUAGE_SHORT = {
+    'eng': 'English',
+    'jpn': 'Japanese',
+    'spa': 'Spanish',
+    'fre': 'French'
+}
+
 
 class Command(BaseCommand):
     help = "Utilities to merge our database with MERLOT"
@@ -55,7 +63,8 @@ class Command(BaseCommand):
         make_option("--linkcheck", action="store", dest="link_check_source", help="Target Source ID to check for 404"),
         make_option("--categorize", action="store", dest="categorize_source", help="Categorizes Source ID"),
         make_option("--license", action="store", dest="license", help="Set MERLOT license to whole source, e.g. cc-by-nc-sa"),
-        make_option("--source", action="store", dest="source_id", help="Source ID")
+        make_option("--source", action="store", dest="source_id", help="Source ID"),
+        make_option("--sync-by-domain", action="store_true", dest="sync_by_domain", help="")
     )
 
     def handle(self, *args, **options):
@@ -74,12 +83,14 @@ class Command(BaseCommand):
             self.link_check(source_id=options.get("link_check_source"))
         elif options.get("license"):
             self.set_license(license_raw=options.get("license"), source_id=options.get("source_id"))
+        elif options.get("sync_by_domain"):
+            self.sync_by_domain()
 
     def subdomain_search(self, url, print_all_urls=False):
         if print_all_urls:
-            print '-------- List of all MERLOT urls -------'
+            print('-------- List of all MERLOT urls -------')
         else:
-            print '-------- Present in MERLOT but missing in OEConsortium -------'
+            print('-------- Present in MERLOT but missing in OEConsortium -------')
 
         params = {
             'licenseKey': settings.MERLOT_KEY,
@@ -90,7 +101,6 @@ class Command(BaseCommand):
         while True:
             r = requests.get(settings.MERLOT_API_URL + '/materialsAdvanced.rest', params=params)
 
-            print r.content
             tree = ET.fromstring(r.content)
             num_results = int(tree.find('nummaterialstotal').text)
 
@@ -99,7 +109,7 @@ class Command(BaseCommand):
                     url = material.find('URL').text
 
                     if print_all_urls:
-                        print url
+                        print(url)
                     else:
                         self._locate_local_url(url)
 
@@ -175,19 +185,19 @@ class Command(BaseCommand):
                     # print "\tset image_url to", course.image_url
                     r = requests.get(course.image_url, allow_redirects=True)
                     if r.status_code == 404:
-                        print '404', course.image_url
+                        print('404 '+ course.image_url)
                         course.image_url = ''
 
                     course.save()
 
-        print '----- Missing in MERLOT but present in OEConsortium ------'
+        print('----- Missing in MERLOT but present in OEConsortium ------')
         for course in Course.objects.filter(linkurl__icontains=url, merlot_present=False, merlot_ignore=False, is_404=False):
             if course.source.id == 13:
                 _import_mit_course(course)
             elif course.source.id == 59:
                 _set_image_url(course, source_id=course.source.id)
 
-            print course.linkurl
+            print(course.linkurl)
 
     def _locate_local_url(self, url):
         def __lookup_source(slug, source_id, lookup_type='icontaints'):
@@ -203,13 +213,13 @@ class Command(BaseCommand):
                     course.save()
                 return course
             except Course.DoesNotExist:
-                print "Missing:", url, slug
+                print("Missing:", url, slug)
                 return
             except Course.MultipleObjectsReturned:
-                print "     -------"
-                print "Too many results", url, slug
+                print("     -------")
+                print("Too many results", url, slug)
                 for i in Course.objects.filter(**lookup_args):
-                    print i.id
+                    print(i.id)
                 raise
 
         # Source: 8 - Johns Hopkins Bloomberg School of Public Health
@@ -368,12 +378,12 @@ class Command(BaseCommand):
 
     def link_check(self, source_id):
         source = Source.objects.get(pk=source_id)
-        print '404 links for %s' % source.provider.name
+        print('404 links for %s' % source.provider.name)
         for course in Course.objects.filter(source=source, is_404=False):
-            print course.linkurl
+            print(course.linkurl)
             r = requests.get(course.linkurl, allow_redirects=True)
             if r.status_code == 404:
-                print '\t', course.linkurl
+                print('\t', course.linkurl)
                 course.is_404 = True
                 course.save()
 
@@ -381,7 +391,7 @@ class Command(BaseCommand):
         source = Source.objects.get(pk=source_id)
 
         parsed = license_raw.split('-')
-        print 'Setting license to', parsed
+        print('Setting license to', parsed)
 
         for course in Course.objects.filter(source=source, is_404=False):
             if 'cc' in parsed:
@@ -402,3 +412,102 @@ class Command(BaseCommand):
                 course.audience = 4
 
             course.save()
+
+    def _update_metadata(self, material):
+        url = material.find('URL').text
+        try:
+            photo_url = material.find('photoURL').text
+        except AttributeError:
+            photo_url = ''
+
+        course_data = {
+            'linkurl': url,
+            'title': material.find('title').text,
+            'merlot_id': material.find('materialid').text,
+            'description': material.find('description').text,
+            'author': material.find('authorName').text or '',
+            'image_url': photo_url,
+            'merlot_xml': ET.tostring(material, encoding='utf-8'),
+            'merlot_synced_date': datetime.datetime.now(),
+            'merlot_synced': True,
+        }
+
+        language = ''
+        for language_short in material.find('languages').findall('language'):
+            language = MERLOT_LANGUAGE_SHORT[language_short.text]
+            # We only support one language at the moment
+            break
+
+        course_data['creative_commons_commercial'] = 'Unsure'
+        creativecommons = material.find('creativecommons').text
+        if 'cc-' in creativecommons:
+            course_data['creative_commons'] = 'Yes'
+
+            if 'nc' in creativecommons:
+                course_data['creative_commons_commercial'] = 'No'
+
+            if 'sa' in creativecommons:
+                course_data['creative_commons_derivatives'] = 'Sa'
+            elif 'nd' in creativecommons:
+                course_data['creative_commons_derivatives'] = 'No'
+            else:
+                course_data['creative_commons_derivatives'] = 'Yes'
+        else:
+            creativecommons = 'No'
+
+        course_data['language'] = language
+
+        try:
+            course = Course.objects.get(linkurl=url)
+        except Course.DoesNotExist:
+            course = Course()
+
+        course_domain = urlsplit(url).netloc
+        if Source.objects.filter(url__icontains=course_domain).exists():
+            source = Source.objects.filter(url__icontains=course_domain)[0]
+            
+            course.source = source
+            course.provider = source.provider
+
+        for k, v in course_data.items():
+            setattr(course, k, v)
+        course.save()
+
+        # course.merlot_categories.clear()
+        for category in material.find('categories').findall('category'):
+            category_id = category.attrib.get('href').split('=')[1]
+            print(category.text, category_id)
+            course.merlot_categories.add(MerlotCategory.objects.get(merlot_id=category_id))
+
+
+    def sync_by_domain(self):
+        for source in Source.objects.all():
+            if not source.url:
+                continue
+
+            domain = 'http://{0}/'.format(urlsplit(source.url).netloc)
+            print(domain)
+
+            params = {
+                'licenseKey': settings.MERLOT_KEY,
+                'page': 1,
+                'url': domain
+            }
+
+            while True:
+                r = requests.get(settings.MERLOT_API_URL + '/materialsAdvanced.rest', params=params)
+
+                print(r.content)
+                tree = ET.fromstring(r.content)
+                num_results = int(tree.find('nummaterialstotal').text)
+
+                if num_results > 0:
+                    for material in tree.findall('material'):
+                        self._update_metadata(material)
+
+                    if params['page'] * 10 > num_results:
+                        break
+                    
+                    params['page'] += 1
+                else:
+                    break

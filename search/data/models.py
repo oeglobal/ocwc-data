@@ -100,8 +100,8 @@ class Course(models.Model):
     linkhash = models.CharField(max_length=96, unique=True)
     linkurl = models.TextField(verbose_name=u'URL')
 
-    provider = models.ForeignKey(Provider)
-    source = models.ForeignKey(Source)
+    provider = models.ForeignKey(Provider, null=True)
+    source = models.ForeignKey(Source, null=True)
     
     description = models.TextField()
     tags = models.TextField(blank=True)
@@ -127,10 +127,14 @@ class Course(models.Model):
 
     merlot_present = models.BooleanField(default=False)
     merlot_synced = models.BooleanField(default=False)
+    merlot_synced_date = models.DateTimeField(null=True)
+    merlot_id = models.IntegerField(null=True)
     merlot_ignore = models.BooleanField(default=False)
+    merlot_material_type = models.CharField(max_length=100, default='')
 
     merlot_categories = TreeManyToManyField('MerlotCategory', blank=True, null=True)
     merlot_url = models.TextField(blank=True, default='')
+    merlot_xml = models.TextField(blank=True, default='')
 
     image_url = models.TextField(blank=True, default='')
     audience = models.IntegerField(null=True, choices=PRIMARY_AUDIENCE_CHOICES)

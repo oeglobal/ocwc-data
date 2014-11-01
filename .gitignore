@@ -11,3 +11,4 @@ solr.tar.gz
 solr/
 var/
 *.sqlite
+merlot_tree.txt
