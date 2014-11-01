@@ -72,7 +72,8 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        if settings.DEBUG:
+        # if settings.DEBUG:
+        if True:
             requests_cache.install_cache('merlot')
 
         if options.get("subdomain_search"):
