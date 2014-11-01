@@ -165,6 +165,13 @@ class Course(models.Model):
             paths.append(u'/'.join(force_unicode(i) for i in (['All'] + list(cat.get_ancestors()) + [cat])))
         return ';'.join(paths)
 
+    def is_member(self):
+        if self.provider:
+            return True
+
+        return False
+
+
 LOG_STATUS_CHOICES = (
     (0, 'Failed'),
     (1, 'Success')

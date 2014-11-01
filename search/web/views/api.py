@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
-import json
-import pysolarized
-from pprint import pprint 
+# import json
+# import pysolarized
 from collections import OrderedDict
 
-from django.shortcuts import render
-from django.http import HttpResponse, Http404
-from django.conf import settings
+# from django.conf import settings
+from django.db.models import Q
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
-from rest_framework.views import APIView
-from rest_framework import viewsets, generics, mixins
+# from rest_framework.views import APIView
+from rest_framework import viewsets, generics
 
 from ..serializers import *
 from data.models import Course, Provider, Category
@@ -58,21 +56,37 @@ def index(request):
         ('category-list', reverse('api:category-list', kwargs={'language': 'English'}, request=request))
     ]))
 
-def search(request):
-    if request.GET.get('q'):
-        q = request.GET.get('q')
-        SOLR_URL = settings.SOLR_URL % 'default'
-        solr = pysolarized.Solr(SOLR_URL)
+# Tombstone: 1.11.2014
+# def search(request):
+#     if request.GET.get('q'):
+#         q = request.GET.get('q')
+#         SOLR_URL = settings.SOLR_URL % 'default'
+#         solr = pysolarized.Solr(SOLR_URL)
 
-        results = solr.query(q)
-        if results:
-            response = results.documents
-        else:
-            response = {'error': 'Search is currently not available'}
-    else:
-        response = {'error': 'Please use q parameter for search'}
+#         results = solr.query(q)
+#         if results:
+#             response = results.documents
+#         else:
+#             response = {'error': 'Search is currently not available'}
+#     else:
+#         response = {'error': 'Please use q parameter for search'}
 
-    return HttpResponse(json.dumps(response), content_type="application/json")
+#     return HttpResponse(json.dumps(response), content_type="application/json")
+
+class SearchResults(generics.ListAPIView):
+    serializer_class = CourseSeachResultsSerializer
+
+    def get_queryset(self):
+        query = self.request.GET.get('q').lower()
+        queryset = Course.objects.filter(
+                                    Q(title__icontains=query) | \
+                                    Q(description__icontains=query) | \
+                                    Q(author__icontains=query) | \
+                                    Q(author_organization__icontains=query)
+                                    )[:20]
+
+        return queryset
+
 
 @api_view(['GET'])
 def course_stats(request):

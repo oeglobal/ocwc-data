@@ -1,5 +1,22 @@
+
 from rest_framework import serializers
 from data.models import Course, Provider, Category
+
+
+class CourseSeachResultsSerializer(serializers.ModelSerializer):
+    is_member = serializers.BooleanField(source='is_member')
+    source = serializers.CharField(source='provider.name')
+    score = serializers.SerializerMethodField('get_score')
+    link = serializers.CharField(source='linkurl')
+    id = serializers.CharField(source='linkhash')
+
+    class Meta:
+        model = Course
+        fields = ('id', 'link', 'title', 'description', 'language', 'is_member', 'source', 'score')
+
+    def get_score(self, obj):
+        return 0
+
 
 
 class CourseListSerializer(serializers.ModelSerializer):
@@ -20,7 +37,6 @@ class CourseSerializer(serializers.ModelSerializer):
                   'date_published', 'id', 'linkurl', 'author', 'categories')
 
     def transform_categories(self, obj, value):
-        # import ipdb; ipdb.set_trace()
         cat_tree = []
         for cat in obj.merlot_categories.all():
             cat_tree.append('/'.join( ['All'] + map( unicode, cat.get_ancestors() ) + [cat.name] ) )
