@@ -108,6 +108,7 @@ class Course(models.Model):
 
     language = models.CharField(max_length=300, choices=LANGUAGE_CHOICES)
     author = models.CharField(max_length=765, default='')
+    author_organization = models.TextField(default='', blank=True)
     rights = models.TextField(default='', blank=True)
     contributors = models.CharField(max_length=765, blank=True, default='')
     license = models.TextField(blank=True, default='')

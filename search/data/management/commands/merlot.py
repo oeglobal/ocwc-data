@@ -431,6 +431,7 @@ class Command(BaseCommand):
             'merlot_id': material.find('materialid').text,
             'description': material.find('description').text,
             'author': material.find('authorName').text or '',
+            'author_organization': material.find('authorOrg').text or '',
             'image_url': photo_url,
             'merlot_xml': ET.tostring(material, encoding='utf-8'),
             'merlot_synced_date': datetime.datetime.now(),
