@@ -16,7 +16,7 @@ from django.conf import settings
 
 from ...category_mappings import mit_to_merlot_category
 
-from data.models import Source, Course, MerlotCategory, SearchQuery
+from data.models import Source, Course, MerlotCategory, MerlotLanguage, SearchQuery
 
 MERLOT_LANGUAGES = {
     'English': 1,
@@ -64,7 +64,6 @@ MERLOT_LANGUAGE_SHORT = {
 MERLOT_LANGUAGES_IGNORED = ['frs',]
 
 
-
 class Command(BaseCommand):
     help = "Utilities to merge our database with MERLOT"
     args = ""
@@ -79,7 +78,8 @@ class Command(BaseCommand):
         make_option("--license", action="store", dest="license", help="Set MERLOT license to whole source, e.g. cc-by-nc-sa"),
         make_option("--source", action="store", dest="source_id", help="Source ID"),
         make_option("--sync-by-domain", action="store_true", dest="sync_by_domain", help=""),
-        make_option("--update_search_queries", action="store_true", dest="update_search_queries", help="Updates Search Queries")
+        make_option("--update_search_queries", action="store_true", dest="update_search_queries", help="Updates Search Queries"),
+        make_option("--add-merlot-languages", action="store_true", dest="add_merlot_languages", help="Adds Merlot Languages to Courses"),
     )
 
     def handle(self, *args, **options):
@@ -103,6 +103,8 @@ class Command(BaseCommand):
             self.sync_by_domain()
         elif options.get("update_search_queries"):
             self.update_search_queries()
+        elif options.get("add_merlot_languages"):
+            self.add_merlot_languages()
 
     def subdomain_search(self, url, print_all_urls=False):
         if print_all_urls:
@@ -451,17 +453,6 @@ class Command(BaseCommand):
             'merlot_synced': True,
         }
 
-        print(course_data['merlot_xml'])
-
-        language = ''
-        for language_short in material.find('languages').findall('language'):
-            if language_short.text in MERLOT_LANGUAGES_IGNORED:
-                continue
-
-            language = MERLOT_LANGUAGE_SHORT[language_short.text]
-            # We only support one language at the moment
-            break
-
         course_data['creative_commons_commercial'] = 'Unsure'
         creativecommons = material.find('creativecommons').text
         if 'cc-' in creativecommons:
@@ -479,7 +470,7 @@ class Command(BaseCommand):
         else:
             creativecommons = 'No'
 
-        course_data['language'] = language
+        # course_data['language'] = language
 
         try:
             course = Course.objects.get(linkurl=url)
@@ -501,6 +492,16 @@ class Command(BaseCommand):
         for category in material.find('categories').findall('category'):
             category_id = category.attrib.get('href').split('=')[1]
             course.merlot_categories.add(MerlotCategory.objects.get(merlot_id=category_id))
+
+        for language_short in material.find('languages').findall('language'):
+            if language_short.text in MERLOT_LANGUAGES_IGNORED:
+                continue
+
+            language = MERLOT_LANGUAGE_SHORT[language_short.text]
+
+            merlot_language, is_created = MerlotLanguage.objects.get_or_create(name=language)
+            course.merlot_languages.add(merlot_language)
+
 
     def _merlot_search(self, params, processing_function, max_pages=99):
         parser = etree.XMLParser(recover=True)
@@ -549,3 +550,8 @@ class Command(BaseCommand):
 
             sq.processed = datetime.datetime.now()
             sq.save()
+
+    def add_merlot_languages(self):
+        for course in Course.objects.filter(merlot_xml__isnull=False):
+            material = course.merlot_xml
+            self._update_metadata(material)
