@@ -13,7 +13,8 @@ class CourseSeachResultsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ('id', 'link', 'title', 'description', 'author', 'author_organization', 'language', 'is_member', 'source', 'score')
+        fields = ('id', 'link', 'title', 'description', 'author', 'author_organization', 
+                  'language', 'is_member', 'source', 'score', 'merlot_id')
 
     def get_score(self, obj):
         return 0
@@ -48,7 +49,7 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = ('linkhash', 'title', 'description', 'tags', 'provider', 'provider_name', 'language',
-                  'date_published', 'id', 'linkurl', 'author', 'categories')
+                  'date_published', 'id', 'linkurl', 'author', 'categories', 'merlot_id')
 
     def transform_categories(self, obj, value):
         cat_tree = []
