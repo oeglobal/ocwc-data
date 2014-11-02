@@ -55,9 +55,12 @@ MERLOT_LANGUAGE_SHORT = {
     'ita': 'Italian',
     'jpn': 'Japanese',
     'spa': 'Spanish',
+    'por': 'Portuguese',
+    'ger': 'German',
 }
 
 MERLOT_LANGUAGES_IGNORED = ['frs',]
+
 
 
 class Command(BaseCommand):
