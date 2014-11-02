@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from data.models import Course, Provider, Category
+from data.models import Course, Provider, MerlotCategory
 
 
 class CourseSeachResultsSerializer(serializers.ModelSerializer):
@@ -20,14 +20,15 @@ class CourseSeachResultsSerializer(serializers.ModelSerializer):
         return 0
 
     def get_language(self, obj):
-        if obj.merlot_languages:
+        if obj.merlot_languages.exists():
             return [lang.name for lang in obj.merlot_languages.all()]
-        else:
+        elif obj.language:
             return [obj.language]
 
+        return ['English']
 
 class CourseListSerializer(serializers.ModelSerializer):
-    categories = serializers.RelatedField(many=True)
+    categories = serializers.RelatedField(source='merlot_categories', many=True)
     language = serializers.SerializerMethodField('get_language')
 
     class Meta:
@@ -35,11 +36,19 @@ class CourseListSerializer(serializers.ModelSerializer):
         fields = ('linkhash', 'title', 'language', 'id', 'linkurl', 'author', 'categories')
 
     def get_language(self, obj):
-        if obj.merlot_languages:
+        if obj.merlot_languages.exists():
             return [lang.name for lang in obj.merlot_languages.all()]
-        else:
+        elif obj.language:
             return [obj.language]
 
+        return ['English']
+
+    def transform_categories(self, obj, value):
+        cat_tree = []
+        for cat in obj.merlot_categories.all():
+            cat_tree.append('/'.join( ['All'] + map( unicode, cat.get_ancestors() ) + [cat.name] ) )
+
+        return cat_tree
 
 class CourseSerializer(serializers.ModelSerializer):
     provider_name = serializers.CharField(source='provider.name')
@@ -59,7 +68,7 @@ class CourseSerializer(serializers.ModelSerializer):
         return cat_tree
 
     def get_language(self, obj):
-        if obj.merlot_languages:
+        if obj.merlot_languages.exists():
             return [lang.name for lang in obj.merlot_languages.all()]
         else:
             return [obj.language]
@@ -73,10 +82,11 @@ class ProviderSerializer(serializers.ModelSerializer):
 
 class CategoryListSerializer(serializers.ModelSerializer):
     course_count = serializers.SerializerMethodField('get_course_count')
+    category_id = serializers.CharField(source="merlot_id")
 
     class Meta:
-        model = Category
-        fields = ('name', 'course_count')
+        model = MerlotCategory
+        fields = ('name', 'category_id', 'course_count')
 
     def __init__(self, *args, **kwargs):
         language = kwargs.pop('language', None)
@@ -85,7 +95,7 @@ class CategoryListSerializer(serializers.ModelSerializer):
         self.language = language
 
     def get_course_count(self, obj):
-        if self.language:
-            return obj.course_set.filter(language=self.language).count()
-        else:
-            return obj.course_set.all().count()
+        if hasattr(obj, 'o_count'):
+            return obj.o_count
+
+        return 0

@@ -13,7 +13,7 @@ from rest_framework.reverse import reverse
 from rest_framework import viewsets, generics
 
 from ..serializers import *
-from data.models import Course, Provider, Category, SearchQuery
+from data.models import Course, Provider, MerlotCategory, SearchQuery
 
 @api_view(['GET'])
 def index(request):
@@ -49,11 +49,11 @@ def index(request):
         ('language-list', reverse('api:language-list', request=request)),
         ('language-courses-list', reverse('api:language-courses-list', kwargs={'language': 'English'}, request=request)),
 
-        ('category-course-list', reverse('api:category-course-list', kwargs={'category': 'Computer Science'}, request=request)),
+        ('category-course-list', reverse('api:category-course-list', kwargs={'category': '372822'}, request=request)),
         # ('category-language-course-list', reverse('category-course-list', kwargs={'language': 'English', 'category': 'Computer Science'}, request=request)),
 
         ('category-list-default', reverse('api:category-list', request=request)),
-        ('category-list', reverse('api:category-list', kwargs={'language': 'English'}, request=request))
+        # ('category-list', reverse('api:category-list', kwargs={'language': 'English'}, request=request))
     ]))
 
 # Tombstone: 1.11.2014
@@ -183,26 +183,36 @@ class CourseCategoryList(generics.ListAPIView):
         
         lookup_params = {}
         if category:
-            lookup_params['categories__name'] = category
+            category_ids = MerlotCategory.objects.get(merlot_id=category).get_children().values_list('id', flat=True)
+            lookup_params['merlot_categories__in'] = category_ids
         if language:
-            lookup_params['language'] = language
+            lookup_params['merlot_languages__name'] = language
+
+        # import ipdb; ipdb.set_trace()
 
         return Course.objects.filter(**lookup_params)
 
 class CategoryList(generics.ListAPIView):
     """
-    List all available Categories for Courses. By default it shows all languages,
-    but supports filtering by language.
+    List all available Categories for Courses.
     """    
-    model = Category
+    model = MerlotCategory
 
-    def serialize_tree(self, queryset, language=None):
+    def get_queryset(self):
+        qs = MerlotCategory.objects.filter(parent=None)
+
+        return MerlotCategory.objects.add_related_count(qs, Course, 'id', 'o_count', True)
+
+    def serialize_tree(self, queryset, language=None, depth=0, max_depth=-1):
+        depth += 1
         for obj in queryset:
             data = CategoryListSerializer(obj, language=language).data
-            data['children'] = self.serialize_tree(obj.children.all(), language=language)
+            if depth < max_depth:
+                children = MerlotCategory.objects.add_related_count(obj.get_children(), Course, 'id', 'o_count', True )
+                data['children'] = self.serialize_tree(children, language=language, depth=depth, max_depth=max_depth)
             yield data
 
     def list(self, request, **kwargs):
-        queryset = self.get_queryset().filter(parent=None)
-        data = self.serialize_tree(queryset, language=kwargs.get('language'))
+        queryset = self.get_queryset() #.filter(parent=None)
+        data = self.serialize_tree(queryset, language=kwargs.get('language'), max_depth=2)
         return Response(data)
