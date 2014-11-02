@@ -183,13 +183,18 @@ class CourseCategoryList(generics.ListAPIView):
         
         lookup_params = {}
         if category:
-            self.category = MerlotCategory.objects.get(merlot_id=category)
-            category_ids = [self.category.id] + \
-                            list(MerlotCategory.objects.get(merlot_id=category) \
-                            .get_children() \
-                            .values_list('id', flat=True))
+            try:
+                self.category = MerlotCategory.objects.get(merlot_id=category)
+                category_ids = [self.category.id] + \
+                                list(MerlotCategory.objects.get(merlot_id=category) \
+                                .get_children() \
+                                .values_list('id', flat=True))
 
-            lookup_params['merlot_categories__in'] = category_ids
+                lookup_params['merlot_categories__in'] = category_ids
+
+            except ValueError:
+                pass
+
         if language:
             lookup_params['merlot_languages__name'] = language
 
@@ -198,7 +203,7 @@ class CourseCategoryList(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         response = super(CourseCategoryList, self).list(request, args, kwargs)
 
-        if self.category:
+        if hasattr(self, 'category'):
             response.data['title'] = self.category.name
 
         return response
