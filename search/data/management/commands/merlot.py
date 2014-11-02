@@ -59,6 +59,7 @@ MERLOT_LANGUAGE_SHORT = {
     'spa': 'Spanish',
     'por': 'Portuguese',
     'ger': 'German',
+    'rus': 'Russian',
 }
 
 MERLOT_LANGUAGES_IGNORED = ['frs',]
