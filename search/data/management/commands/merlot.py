@@ -45,15 +45,16 @@ MERLOT_LANGUAGES = {
 }
 
 MERLOT_LANGUAGE_SHORT = {
-    'eng': 'English',
-    'jpn': 'Japanese',
-    'spa': 'Spanish',
-    'fre': 'French',
     'ara': 'Arabic',
-    'heb': 'Hebrew',
+    'chi': 'Chinese',
     'dum': 'Dutch',
     'dut': 'Dutch',
-    'chi': 'Chinese'
+    'eng': 'English',
+    'fre': 'French',
+    'heb': 'Hebrew',
+    'ita': 'Italian',
+    'jpn': 'Japanese',
+    'spa': 'Spanish',
 }
 
 MERLOT_LANGUAGES_IGNORED = ['frs',]

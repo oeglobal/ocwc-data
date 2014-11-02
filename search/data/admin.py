@@ -31,9 +31,13 @@ class MerlotCategoryAdmin(MPTTModelAdmin):
     search_fields = ('name', 'merlot_id')
     list_per_page = 1200
 
+class SearchQueryAdmin(admin.ModelAdmin):
+    list_display = ('query', 'language', 'processed')
+    search_fields = ('query',)
+
 admin.site.register(Provider, ProviderAdmin)
 admin.site.register(Source, SourceAdmin)
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(MerlotCategory, MerlotCategoryAdmin)
-admin.site.register(SearchQuery)
+admin.site.register(SearchQuery, SearchQueryAdmin)
