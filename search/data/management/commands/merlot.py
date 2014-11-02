@@ -52,6 +52,7 @@ MERLOT_LANGUAGE_SHORT = {
     'ara': 'Arabic',
     'heb': 'Hebrew',
     'dum': 'Dutch',
+    'dut': 'Dutch',
     'chi': 'Chinese'
 }
 
