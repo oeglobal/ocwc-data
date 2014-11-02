@@ -183,14 +183,26 @@ class CourseCategoryList(generics.ListAPIView):
         
         lookup_params = {}
         if category:
-            category_ids = MerlotCategory.objects.get(merlot_id=category).get_children().values_list('id', flat=True)
+            self.category = MerlotCategory.objects.get(merlot_id=category)
+            category_ids = [self.category.id] + \
+                            list(MerlotCategory.objects.get(merlot_id=category) \
+                            .get_children() \
+                            .values_list('id', flat=True))
+
             lookup_params['merlot_categories__in'] = category_ids
         if language:
             lookup_params['merlot_languages__name'] = language
 
-        # import ipdb; ipdb.set_trace()
-
         return Course.objects.filter(**lookup_params)
+
+    def list(self, request, *args, **kwargs):
+        response = super(CourseCategoryList, self).list(request, args, kwargs)
+
+        if self.category:
+            response.data['title'] = self.category.name
+
+        return response
+
 
 class CategoryList(generics.ListAPIView):
     """
@@ -208,11 +220,10 @@ class CategoryList(generics.ListAPIView):
         for obj in queryset:
             data = CategoryListSerializer(obj, language=language).data
             if depth < max_depth:
-                children = MerlotCategory.objects.add_related_count(obj.get_children(), Course, 'id', 'o_count', True )
+                children = MerlotCategory.objects.add_related_count(obj.children.all(), Course, 'id', 'o_count', True )
                 data['children'] = self.serialize_tree(children, language=language, depth=depth, max_depth=max_depth)
             yield data
 
     def list(self, request, **kwargs):
-        queryset = self.get_queryset() #.filter(parent=None)
-        data = self.serialize_tree(queryset, language=kwargs.get('language'), max_depth=2)
+        data = self.serialize_tree(self.get_queryset(), language=kwargs.get('language'), max_depth=2)
         return Response(data)
