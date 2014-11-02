@@ -72,7 +72,7 @@ MERLOT_LANGUAGE_SHORT = {
     'vie': 'Vietnamese',
 }
 
-MERLOT_LANGUAGES_IGNORED = ['frs',]
+MERLOT_LANGUAGES_IGNORED = ['frs', 'ca']
 
 
 class Command(BaseCommand):

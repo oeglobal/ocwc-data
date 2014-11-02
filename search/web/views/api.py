@@ -13,7 +13,7 @@ from rest_framework.reverse import reverse
 from rest_framework import viewsets, generics
 
 from ..serializers import *
-from data.models import Course, Provider, MerlotCategory, SearchQuery
+from data.models import Course, Provider, MerlotCategory, SearchQuery, MerlotLanguage
 
 @api_view(['GET'])
 def index(request):
@@ -156,18 +156,26 @@ class LanguageList(viewsets.ViewSet):
     List all Languages in the database
     """
     def list(self, request):
-        data = Course.objects.all().order_by('language').values_list('language', flat=True).distinct()
+        data = MerlotLanguage.objects.all().order_by('name').values_list('name', flat=True).distinct()
         return Response(data)
 
 class CourseList(generics.ListAPIView):
     """
     List all available Courses for Language
     """
-    def get_queryset(self):
-        return Course.objects.filter(**self.kwargs)
     serializer_class = CourseListSerializer
     paginate_by = 25
     paginate_by_param = 'limit'
+
+    def get_queryset(self):
+        return Course.objects.filter(**self.kwargs)
+
+    def list(self, request, *args, **kwargs):
+        response = super(CourseList, self).list(request, args, kwargs)
+
+        response.data['language'] = self.kwargs.get('language')
+
+        return response
 
 class CourseCategoryList(generics.ListAPIView):
     """

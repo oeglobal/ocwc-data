@@ -11,7 +11,7 @@ urlpatterns = patterns('',
 	url(r'^courses/view/(?P<linkhash>\w+)/$', api.CourseDetail.as_view(lookup_field='linkhash'), name='course-detail'),
 	url(r'^courses/search/$', api.SearchResults.as_view(), name='search-query'),
 
-	url(r'^languages/(?P<language>[\w|\W]+)/courses/$', api.CourseList.as_view(lookup_field='language'), name='language-courses-list'),
+	url(r'^languages/(?P<language>[\w|\W]+)/courses/$', api.CourseList.as_view(lookup_field='merlot_languages'), name='language-courses-list'),
 	url(r'^languages/$', api.LanguageList.as_view({'get': 'list'}), name='language-list'),
 
 	# url(r'^categories/(?P<category>[\w|\W]+)/(?P<language>[\w|\W]+)/$', views.CourseCategoryList.as_view(), name='category-course-list'),
