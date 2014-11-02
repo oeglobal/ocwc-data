@@ -132,7 +132,7 @@ class Course(models.Model):
     merlot_id = models.IntegerField(null=True)
     merlot_ignore = models.BooleanField(default=False)
     merlot_material_type = models.CharField(max_length=100, default='', blank=True)
-    merlot_languages = models.ForeignKey('MerlotLanguage', null=True)
+    merlot_languages = models.ManyToManyField('MerlotLanguage', null=True)
 
     merlot_categories = TreeManyToManyField('MerlotCategory', blank=True, null=True)
     merlot_url = models.TextField(blank=True, default='')

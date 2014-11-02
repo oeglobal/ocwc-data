@@ -74,10 +74,11 @@ def index(request):
 #     return HttpResponse(json.dumps(response), content_type="application/json")
 
 class SearchResults(generics.ListAPIView):
+    """Use `q` paramater to specify query string. Pagination is not supported."""
     serializer_class = CourseSeachResultsSerializer
 
     def get_queryset(self):
-        query = self.request.GET.get('q').lower()
+        query = self.request.GET.get('q', '').lower()
 
         SearchQuery.objects.get_or_create(
             query = query,

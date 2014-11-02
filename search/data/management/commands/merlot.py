@@ -46,20 +46,30 @@ MERLOT_LANGUAGES = {
 
 MERLOT_LANGUAGE_SHORT = {
     'ara': 'Arabic',
+    'bos': 'Bosnian',
     'cat': 'Catalan',
     'chi': 'Chinese',
+    'cze': 'Czech',
+    'dan': 'Danish',
     'dum': 'Dutch',
     'dut': 'Dutch',
     'eng': 'English',
     'fre': 'French',
+    'ger': 'German',
+    'gre': 'Greek',
     'heb': 'Hebrew',
+    'ice': 'Icelandic',
     'ita': 'Italian',
+    'jap': 'Japanese',
     'jpn': 'Japanese',
     'kor': 'Korean',
-    'spa': 'Spanish',
+    'lat': 'Latin',
     'por': 'Portuguese',
-    'ger': 'German',
     'rus': 'Russian',
+    'spa': 'Spanish',
+    'swe': 'Swedish',
+    'tur': 'Turkish',
+    'vie': 'Vietnamese',
 }
 
 MERLOT_LANGUAGES_IGNORED = ['frs',]
@@ -501,7 +511,10 @@ class Command(BaseCommand):
             language = MERLOT_LANGUAGE_SHORT[language_short.text]
 
             merlot_language, is_created = MerlotLanguage.objects.get_or_create(name=language)
+            print merlot_language
             course.merlot_languages.add(merlot_language)
+
+        course.save()
 
 
     def _merlot_search(self, params, processing_function, max_pages=99):
@@ -553,6 +566,8 @@ class Command(BaseCommand):
             sq.save()
 
     def add_merlot_languages(self):
-        for course in Course.objects.filter(merlot_xml__isnull=False):
-            material = course.merlot_xml
-            self._update_metadata(material)
+        parser = etree.XMLParser(recover=True)
+        for course in Course.objects.all():
+            if len(course.merlot_xml) > 10:
+                material = ET.fromstring(course.merlot_xml, parser=parser)
+                self._update_metadata(material)

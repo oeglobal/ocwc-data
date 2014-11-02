@@ -9,6 +9,7 @@ class CourseSeachResultsSerializer(serializers.ModelSerializer):
     score = serializers.SerializerMethodField('get_score')
     link = serializers.CharField(source='linkurl')
     id = serializers.CharField(source='linkhash')
+    language = serializers.SerializerMethodField('get_language')
 
     class Meta:
         model = Course
@@ -17,19 +18,32 @@ class CourseSeachResultsSerializer(serializers.ModelSerializer):
     def get_score(self, obj):
         return 0
 
+    def get_language(self, obj):
+        if obj.merlot_languages:
+            return [lang.name for lang in obj.merlot_languages.all()]
+        else:
+            return [obj.language]
 
 
 class CourseListSerializer(serializers.ModelSerializer):
     categories = serializers.RelatedField(many=True)
+    language = serializers.SerializerMethodField('get_language')
 
     class Meta:
         model = Course
         fields = ('linkhash', 'title', 'language', 'id', 'linkurl', 'author', 'categories')
 
+    def get_language(self, obj):
+        if obj.merlot_languages:
+            return [lang.name for lang in obj.merlot_languages.all()]
+        else:
+            return [obj.language]
+
 
 class CourseSerializer(serializers.ModelSerializer):
     provider_name = serializers.CharField(source='provider.name')
     categories = serializers.RelatedField(source='merlot_categories', many=True)
+    language = serializers.SerializerMethodField('get_language')
 
     class Meta:
         model = Course
@@ -42,6 +56,12 @@ class CourseSerializer(serializers.ModelSerializer):
             cat_tree.append('/'.join( ['All'] + map( unicode, cat.get_ancestors() ) + [cat.name] ) )
 
         return cat_tree
+
+    def get_language(self, obj):
+        if obj.merlot_languages:
+            return [lang.name for lang in obj.merlot_languages.all()]
+        else:
+            return [obj.language]
 
 
 class ProviderSerializer(serializers.ModelSerializer):

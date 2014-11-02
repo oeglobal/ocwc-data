@@ -6,7 +6,7 @@ from .models import *
 
 class CourseAdmin(admin.ModelAdmin):
     list_display = ('title', 'language', 'provider', 'merlot_present', 'is_404')
-    list_filter = ('language', 'provider', 'merlot_present', 'is_404')
+    list_filter = ('provider', 'merlot_present', 'is_404', 'merlot_languages')
     search_fields = ('title', 'description', 'linkurl')
 
 
@@ -41,3 +41,4 @@ admin.site.register(Course, CourseAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(MerlotCategory, MerlotCategoryAdmin)
 admin.site.register(SearchQuery, SearchQueryAdmin)
+admin.site.register(MerlotLanguage)
