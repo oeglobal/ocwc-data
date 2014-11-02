@@ -46,6 +46,7 @@ MERLOT_LANGUAGES = {
 
 MERLOT_LANGUAGE_SHORT = {
     'ara': 'Arabic',
+    'cat': 'Catalan',
     'chi': 'Chinese',
     'dum': 'Dutch',
     'dut': 'Dutch',
@@ -54,6 +55,7 @@ MERLOT_LANGUAGE_SHORT = {
     'heb': 'Hebrew',
     'ita': 'Italian',
     'jpn': 'Japanese',
+    'kor': 'Korean',
     'spa': 'Spanish',
     'por': 'Portuguese',
     'ger': 'German',
