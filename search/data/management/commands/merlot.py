@@ -540,7 +540,7 @@ class Command(BaseCommand):
                 'keywords': sq.query
             }
 
-            self._merlot_search(params, self._update_metadata, max_pages=30)
+            self._merlot_search(params, self._update_metadata, max_pages=5)
 
             sq.processed = datetime.datetime.now()
             sq.save()
