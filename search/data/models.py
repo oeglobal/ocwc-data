@@ -208,3 +208,14 @@ class MerlotCategory(MPTTModel):
 
     def __unicode__(self):
         return self.name
+
+class SearchQuery(models.Model):
+    query = models.TextField()
+    language = models.CharField(max_length=150, blank=True)
+    count = models.IntegerField(default=1)
+
+    added = models.DateTimeField(auto_now_add=True)
+    processed = models.DateTimeField(null=True)
+
+    def __unicode__(self):
+        return self.query

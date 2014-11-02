@@ -13,7 +13,7 @@ from rest_framework.reverse import reverse
 from rest_framework import viewsets, generics
 
 from ..serializers import *
-from data.models import Course, Provider, Category
+from data.models import Course, Provider, Category, SearchQuery
 
 @api_view(['GET'])
 def index(request):
@@ -78,6 +78,14 @@ class SearchResults(generics.ListAPIView):
 
     def get_queryset(self):
         query = self.request.GET.get('q').lower()
+
+        SearchQuery.objects.get_or_create(
+            query = query,
+            defaults = {
+                'language': ''
+            }
+        )
+
         queryset = Course.objects.filter(
                                     Q(title__icontains=query) | \
                                     Q(description__icontains=query) | \

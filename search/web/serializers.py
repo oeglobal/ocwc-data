@@ -12,7 +12,7 @@ class CourseSeachResultsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ('id', 'link', 'title', 'description', 'language', 'is_member', 'source', 'score')
+        fields = ('id', 'link', 'title', 'description', 'author', 'author_organization', 'language', 'is_member', 'source', 'score')
 
     def get_score(self, obj):
         return 0

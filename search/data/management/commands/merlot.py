@@ -16,7 +16,7 @@ from django.conf import settings
 
 from ...category_mappings import mit_to_merlot_category
 
-from data.models import Source, Course, MerlotCategory
+from data.models import Source, Course, MerlotCategory, SearchQuery
 
 MERLOT_LANGUAGES = {
     'English': 1,
@@ -51,8 +51,11 @@ MERLOT_LANGUAGE_SHORT = {
     'fre': 'French',
     'ara': 'Arabic',
     'heb': 'Hebrew',
-    'dum': 'Dutch'
+    'dum': 'Dutch',
+    'chi': 'Chinese'
 }
+
+MERLOT_LANGUAGES_IGNORED = ['frs',]
 
 
 class Command(BaseCommand):
@@ -68,7 +71,8 @@ class Command(BaseCommand):
         make_option("--categorize", action="store", dest="categorize_source", help="Categorizes Source ID"),
         make_option("--license", action="store", dest="license", help="Set MERLOT license to whole source, e.g. cc-by-nc-sa"),
         make_option("--source", action="store", dest="source_id", help="Source ID"),
-        make_option("--sync-by-domain", action="store_true", dest="sync_by_domain", help="")
+        make_option("--sync-by-domain", action="store_true", dest="sync_by_domain", help=""),
+        make_option("--update_search_queries", action="store_true", dest="update_search_queries", help="Updates Search Queries")
     )
 
     def handle(self, *args, **options):
@@ -90,6 +94,8 @@ class Command(BaseCommand):
             self.set_license(license_raw=options.get("license"), source_id=options.get("source_id"))
         elif options.get("sync_by_domain"):
             self.sync_by_domain()
+        elif options.get("update_search_queries"):
+            self.update_search_queries()
 
     def subdomain_search(self, url, print_all_urls=False):
         if print_all_urls:
@@ -438,10 +444,13 @@ class Command(BaseCommand):
             'merlot_synced': True,
         }
 
-        print course_data['merlot_xml']
+        print(course_data['merlot_xml'])
 
         language = ''
         for language_short in material.find('languages').findall('language'):
+            if language_short.text in MERLOT_LANGUAGES_IGNORED:
+                continue
+
             language = MERLOT_LANGUAGE_SHORT[language_short.text]
             # We only support one language at the moment
             break
@@ -486,6 +495,24 @@ class Command(BaseCommand):
             category_id = category.attrib.get('href').split('=')[1]
             course.merlot_categories.add(MerlotCategory.objects.get(merlot_id=category_id))
 
+    def _merlot_search(self, params, processing_function, max_pages=99):
+        parser = etree.XMLParser(recover=True)
+        while True:
+            r = requests.get(settings.MERLOT_API_URL + '/materialsAdvanced.rest', params=params)
+
+            tree = ET.fromstring(r.content, parser=parser)
+            num_results = int(tree.find('nummaterialstotal').text)
+
+            if num_results > 0:
+                for material in tree.findall('material'):
+                    processing_function(material)
+
+                if params['page'] * 10 > num_results or params['page'] > max_pages:
+                    break
+                
+                params['page'] += 1
+            else:
+                break
 
     def sync_by_domain(self):
         for source in Source.objects.all():
@@ -501,22 +528,17 @@ class Command(BaseCommand):
                 'url': domain
             }
 
-            parser = etree.XMLParser(recover=True)
-            while True:
-                r = requests.get(settings.MERLOT_API_URL + '/materialsAdvanced.rest', params=params)
-                print('\n\n---------------------------------\n\n')
-                print(r.content)
+            self._merlot_search(params, self._update_metadata)
 
-                tree = ET.fromstring(r.content, parser=parser)
-                num_results = int(tree.find('nummaterialstotal').text)
+    def update_search_queries(self):
+        for sq in SearchQuery.objects.filter(processed__isnull=True):
+            params = {
+                'licenseKey': settings.MERLOT_KEY,
+                'page': 1,
+                'keywords': sq.query
+            }
 
-                if num_results > 0:
-                    for material in tree.findall('material'):
-                        self._update_metadata(material)
+            self._merlot_search(params, self._update_metadata, max_pages=30)
 
-                    if params['page'] * 10 > num_results:
-                        break
-                    
-                    params['page'] += 1
-                else:
-                    break
+            sq.processed = datetime.datetime.now()
+            sq.save()
