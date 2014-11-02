@@ -71,6 +71,7 @@ MERLOT_LANGUAGE_SHORT = {
     'tur': 'Turkish',
     'vie': 'Vietnamese',
     'pl': 'Polish',
+    'nor': 'Norwegian'
 }
 
 MERLOT_LANGUAGES_IGNORED = ['frs', 'ca']
