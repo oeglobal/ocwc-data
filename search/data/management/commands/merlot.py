@@ -508,13 +508,13 @@ class Command(BaseCommand):
             course.merlot_categories.add(MerlotCategory.objects.get(merlot_id=category_id))
 
         for language_short in material.find('languages').findall('language'):
-            if language_short.text in MERLOT_LANGUAGES_IGNORED:
+            if language_short.text not in MERLOT_LANGUAGE_SHORT:
                 continue
 
             language = MERLOT_LANGUAGE_SHORT[language_short.text]
 
             merlot_language, is_created = MerlotLanguage.objects.get_or_create(name=language)
-            print merlot_language
+            # print merlot_language
             course.merlot_languages.add(merlot_language)
 
         course.save()
