@@ -153,7 +153,7 @@ def search(request):
                 course = _update_metadata(material)
 
                 if course.source:
-                    source = course.source.name
+                    source = course.source.provider.name
                 else:
                     if course.author:
                         source = course.author
