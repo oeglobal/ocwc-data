@@ -9,7 +9,7 @@ urlpatterns = patterns('',
 	url(r'^courses/stats/$', 'web.views.api.course_stats', name='course-stats'),	
 	url(r'^courses/latest/$', api.CourseLatestList.as_view(), name='course-latest'),
 	url(r'^courses/view/(?P<linkhash>\w+)/$', api.CourseDetail.as_view(lookup_field='linkhash'), name='course-detail'),
-	url(r'^courses/search/$', api.SearchResults.as_view(), name='search-query'),
+	url(r'^courses/search/$', 'web.views.api.search', name='search-query'),
 
 	url(r'^languages/(?P<language>[\w|\W]+)/courses/$', api.CourseList.as_view(lookup_field='merlot_languages'), name='language-courses-list'),
 	url(r'^languages/$', api.LanguageList.as_view({'get': 'list'}), name='language-list'),

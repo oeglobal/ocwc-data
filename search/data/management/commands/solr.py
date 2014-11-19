@@ -54,7 +54,7 @@ class Command(BaseCommand):
 
             self.stdout.write("Adding %s to %s" % (lang, SOLR_URL))
 
-            for course in Course.objects.filter(language__iexact=lang):
+            for course in Course.objects.filter(language__iexact=lang, provider__isnull=False):
                 if not course.title: continue
 
                 solr_doc = {

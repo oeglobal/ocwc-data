@@ -1,10 +1,17 @@
 # -*- coding: utf-8 -*-
-# import json
-# import pysolarized
+import json
+import pysolarized
+import requests
+import datetime
 from collections import OrderedDict
+from lxml import etree
+from urllib import urlencode
+import xml.etree.ElementTree as ET
+from urlparse import urlsplit, parse_qs
 
-# from django.conf import settings
+from django.conf import settings
 from django.db.models import Q
+from django.http import HttpResponse
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -13,7 +20,8 @@ from rest_framework.reverse import reverse
 from rest_framework import viewsets, generics
 
 from ..serializers import *
-from data.models import Course, Provider, MerlotCategory, SearchQuery, MerlotLanguage
+from data.models import Course, Source, Provider, MerlotCategory, MerlotLanguage
+from data.management.commands.merlot import MERLOT_LANGUAGES, MERLOT_LANGUAGE_SHORT
 
 @api_view(['GET'])
 def index(request):
@@ -56,45 +64,190 @@ def index(request):
         # ('category-list', reverse('api:category-list', kwargs={'language': 'English'}, request=request))
     ]))
 
-# Tombstone: 1.11.2014
-# def search(request):
-#     if request.GET.get('q'):
-#         q = request.GET.get('q')
-#         SOLR_URL = settings.SOLR_URL % 'default'
-#         solr = pysolarized.Solr(SOLR_URL)
+def search(request):
+    def _update_metadata(material):
+        url = material.find('URL').text
+        try:
+            photo_url = material.find('photoURL').text
+        except AttributeError:
+            photo_url = ''
 
-#         results = solr.query(q)
-#         if results:
-#             response = results.documents
-#         else:
-#             response = {'error': 'Search is currently not available'}
-#     else:
-#         response = {'error': 'Please use q parameter for search'}
+        course_data = {
+            'linkurl': url,
+            'title': material.find('title').text,
+            'merlot_id': material.find('materialid').text,
+            'description': material.find('description').text,
+            'author': material.find('authorName').text or '',
+            'author_organization': material.find('authorOrg').text or '',
+            'image_url': photo_url,
+            'merlot_xml': ET.tostring(material, encoding='utf-8'),
+            'merlot_synced_date': datetime.datetime.now(),
+            'merlot_synced': True,
+        }
 
-#     return HttpResponse(json.dumps(response), content_type="application/json")
+        course_data['creative_commons_commercial'] = 'Unsure'
+        creativecommons = material.find('creativecommons').text
+        if 'cc-' in creativecommons:
+            course_data['creative_commons'] = 'Yes'
 
-class SearchResults(generics.ListAPIView):
-    """Use `q` paramater to specify query string. Pagination is not supported."""
-    serializer_class = CourseSeachResultsSerializer
+            if 'nc' in creativecommons:
+                course_data['creative_commons_commercial'] = 'No'
 
-    def get_queryset(self):
-        query = self.request.GET.get('q', '').lower()
+            if 'sa' in creativecommons:
+                course_data['creative_commons_derivatives'] = 'Sa'
+            elif 'nd' in creativecommons:
+                course_data['creative_commons_derivatives'] = 'No'
+            else:
+                course_data['creative_commons_derivatives'] = 'Yes'
+        else:
+            creativecommons = 'No'
 
-        SearchQuery.objects.get_or_create(
-            query = query,
-            defaults = {
-                'language': ''
+        # course_data['language'] = language
+
+        try:
+            course = Course.objects.get(linkurl=url)
+        except Course.DoesNotExist:
+            course = Course()
+
+        course_domain = urlsplit(url).netloc
+        if Source.objects.filter(url__icontains=course_domain).exists():
+            source = Source.objects.filter(url__icontains=course_domain)[0]
+            
+            course.source = source
+            course.provider = source.provider
+
+        for k, v in course_data.items():
+            setattr(course, k, v)
+        course.save()
+
+        # course.merlot_categories.clear()
+        for category in material.find('categories').findall('category'):
+            category_id = category.attrib.get('href').split('=')[1]
+            course.merlot_categories.add(MerlotCategory.objects.get(merlot_id=category_id))
+
+        for language_short in material.find('languages').findall('language'):
+            if language_short.text not in MERLOT_LANGUAGE_SHORT:
+                continue
+
+            language = MERLOT_LANGUAGE_SHORT[language_short.text]
+
+            merlot_language, is_created = MerlotLanguage.objects.get_or_create(name=language)
+            # print merlot_language
+            course.merlot_languages.add(merlot_language)
+
+        course.save()
+
+        return course
+
+    def _merlot_search(params):
+        parser = etree.XMLParser(recover=True)
+        
+        r = requests.get(settings.MERLOT_API_URL + '/materialsAdvanced.rest', params=params)
+        tree = ET.fromstring(r.content, parser=parser)
+        num_results = int(tree.find('nummaterialstotal').text)
+
+
+        documents = []
+        if num_results > 0:
+            for material in tree.findall('material'):
+                course = _update_metadata(material)
+
+                doc = {
+                    'description': course.description,
+                    'language': ','.join([lang.name for lang in course.merlot_languages.all()]),
+                    'title': course.title,
+                    'is_member': bool(course.provider),
+                    'source': course.source or course.author,
+                    'link': course.linkurl,
+                    'id': course.linkhash
+                }
+                documents.append(doc)
+
+        return documents, num_results
+
+
+    """Use `q` paramater to specify query string, `legacy=1` to use the old search"""
+
+    if request.GET.get('q') and request.GET.get('legacy', '0') != '0':
+        q = request.GET.get('q')
+        SOLR_URL = settings.SOLR_URL % 'default'
+        solr = pysolarized.Solr(SOLR_URL)
+
+        solr_kwargs = {'start': 0, 'rows': 10}
+        page = int(request.GET.get('page', 1))
+
+        if page:
+            solr_kwargs['start'] = (page - 1) * 10
+
+        results = solr.query(q, **solr_kwargs)
+        if results:
+            
+            response = {
+                'page': page,
+                'count': results.results_count,
+                'documents': results.documents
             }
-        )
 
-        queryset = Course.objects.filter(
-                                    Q(title__icontains=query) | \
-                                    Q(description__icontains=query) | \
-                                    Q(author__icontains=query) | \
-                                    Q(author_organization__icontains=query)
-                                    )[:20]
+            if results.results_count > page * 10:
+                response['next_page'] = urlencode({'page': page+1, 'legacy': 'on', 'q': q})
 
-        return queryset
+            if page > 1:
+                response['previous_page'] = urlencode({'page': page-1, 'legacy': 'on', 'q': q})
+
+        else:
+            response = {'error': 'Search is currently not available'}
+
+    elif request.GET.get('q'):
+        page = int(request.GET.get('page', 1))
+        q = request.GET.get('q')
+
+        params = {
+            'licenseKey': settings.MERLOT_KEY,
+            'page': page,
+            'keywords': q
+        }
+        data, count = _merlot_search(params)
+
+        response = {
+            'page': page,
+            'count': count,
+            'documents': data
+        }
+
+        if count > page * 10:
+            response['next_page'] = urlencode({'page': page+1, 'q': q})
+
+        if page > 1:
+            response['previous_page'] = urlencode({'page': page-1, 'q': q})
+
+
+    else:
+        response = {'error': 'Please use q parameter for search'}
+
+    return HttpResponse(json.dumps(response), content_type="application/json")
+
+# class SearchResults(generics.ListAPIView):
+#     """Use `q` paramater to specify query string. Pagination is not supported."""
+#     serializer_class = CourseSeachResultsSerializer
+
+#     def get_queryset(self):
+#         query = self.request.GET.get('q', '').lower()
+
+#         SearchQuery.objects.get_or_create(
+#             query = query,
+#             defaults = {
+#                 'language': ''
+#             }
+#         )
+
+#         queryset = Course.objects.filter(
+#                                     Q(title__icontains=query) | \
+#                                     Q(description__icontains=query) | \
+#                                     Q(author__icontains=query) | \
+#                                     Q(author_organization__icontains=query)
+#                                     )[:20]
+
+#         return queryset
 
 
 @api_view(['GET'])
