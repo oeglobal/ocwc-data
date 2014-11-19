@@ -152,12 +152,20 @@ def search(request):
             for material in tree.findall('material'):
                 course = _update_metadata(material)
 
+                if course.source:
+                    source = course.source.name
+                else:
+                    if course.author:
+                        source = course.author
+                    else:
+                        source = ''
+
                 doc = {
                     'description': course.description,
                     'language': ','.join([lang.name for lang in course.merlot_languages.all()]),
                     'title': course.title,
                     'is_member': bool(course.provider),
-                    'source': course.source or course.author,
+                    'source': source,
                     'link': course.linkurl,
                     'id': course.linkhash
                 }
