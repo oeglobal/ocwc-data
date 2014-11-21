@@ -7,10 +7,9 @@ from collections import OrderedDict
 from lxml import etree
 from urllib import urlencode
 import xml.etree.ElementTree as ET
-from urlparse import urlsplit, parse_qs
+from urlparse import urlsplit
 
 from django.conf import settings
-from django.db.models import Q
 from django.http import HttpResponse
 
 from rest_framework.response import Response
@@ -21,7 +20,7 @@ from rest_framework import viewsets, generics
 
 from ..serializers import *
 from data.models import Course, Source, Provider, MerlotCategory, MerlotLanguage
-from data.management.commands.merlot import MERLOT_LANGUAGES, MERLOT_LANGUAGE_SHORT
+from data.management.commands.merlot import MERLOT_LANGUAGE_SHORT
 
 @api_view(['GET'])
 def index(request):
@@ -329,7 +328,7 @@ class CourseList(generics.ListAPIView):
     paginate_by_param = 'limit'
 
     def get_queryset(self):
-        return Course.objects.filter(**self.kwargs)
+        return Course.objects.filter(source__isnull=False, **self.kwargs)
 
     def list(self, request, *args, **kwargs):
         response = super(CourseList, self).list(request, args, kwargs)
@@ -350,7 +349,7 @@ class CourseCategoryList(generics.ListAPIView):
         category = self.kwargs.pop('category', None)
         language = self.kwargs.pop('language', None)
         
-        lookup_params = {}
+        lookup_params = {'source__isnull': False}
         if category:
             try:
                 self.category = MerlotCategory.objects.get(merlot_id=category)
