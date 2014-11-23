@@ -104,7 +104,7 @@ def search(request):
         # course_data['language'] = language
 
         try:
-            course = Course.objects.get(linkurl=url)
+            course = Course.objects.get(linkhash=Course.calculate_linkhash(url))
         except Course.DoesNotExist:
             course = Course()
 

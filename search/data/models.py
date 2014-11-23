@@ -148,9 +148,13 @@ class Course(models.Model):
 
     is_404 = models.BooleanField(default=False)
 
+    @staticmethod
+    def calculate_linkhash(linkurl):
+        return hashlib.md5(linkurl.encode('utf-8')).hexdigest()
+
     def save(self, update_linkhash=False, force_insert=False, force_update=False, using=None):
         if not self.linkhash or update_linkhash:
-            self.linkhash = hashlib.md5(self.linkurl.encode('utf-8')).hexdigest()
+            self.linkhash = self.calculate_linkhash(self.linkurl)
 
         super(Course, self).save(force_insert=force_insert, force_update=force_update, using=using)
 
