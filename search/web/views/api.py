@@ -64,6 +64,33 @@ def index(request):
     ]))
 
 def search(request):
+
+    def encode_obj(in_obj):
+        """ http://stackoverflow.com/a/26568590/141200 """
+
+        def encode_list(in_list):
+            out_list = []
+            for el in in_list:
+                out_list.append(encode_obj(el))
+            return out_list
+
+        def encode_dict(in_dict):
+            out_dict = {}
+            for k, v in in_dict.iteritems():
+                out_dict[k] = encode_obj(v)
+            return out_dict
+
+        if isinstance(in_obj, unicode):
+            return in_obj.encode('utf-8')
+        elif isinstance(in_obj, list):
+            return encode_list(in_obj)
+        elif isinstance(in_obj, tuple):
+            return tuple(encode_list(in_obj))
+        elif isinstance(in_obj, dict):
+            return encode_dict(in_obj)
+
+        return in_obj
+
     def _update_metadata(material):
         url = material.find('URL').text
         try:
@@ -196,10 +223,10 @@ def search(request):
             }
 
             if results.results_count > page * 10:
-                response['next_page'] = urlencode({'page': page+1, 'legacy': 'on', 'q': q})
+                response['next_page'] = urlencode(encode_obj({'page': page+1, 'legacy': 'on', 'q': q}))
 
             if page > 1:
-                response['previous_page'] = urlencode({'page': page-1, 'legacy': 'on', 'q': q})
+                response['previous_page'] = urlencode(encode_obj({'page': page-1, 'legacy': 'on', 'q': q}))
 
         else:
             response = {'error': 'Search is currently not available'}
@@ -222,10 +249,10 @@ def search(request):
         }
 
         if count > page * 10:
-            response['next_page'] = urlencode({'page': page+1, 'q': q})
+            response['next_page'] = urlencode(encode_obj({'page': page+1, 'q': q}))
 
         if page > 1:
-            response['previous_page'] = urlencode({'page': page-1, 'q': q})
+            response['previous_page'] = urlencode(encode_obj({'page': page-1, 'q': q}))
 
 
     else:
