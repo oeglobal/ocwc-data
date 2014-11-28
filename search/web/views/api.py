@@ -181,12 +181,10 @@ def search(request):
                 if course.source:
                     source = course.source.provider.name
                 else:
-                    if course.author and course.author_organization:
-                        source = "{0}, {1}".format(course.author, course.author_organization)
+                    if not course.author and course.author_organization:
+                        source = course.author_organization
                     elif course.author:
                         source = course.author
-                    elif course.author_organization:
-                        source = course.author_organization
                     else:
                         source = ''
 
