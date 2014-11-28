@@ -178,15 +178,14 @@ def search(request):
             for material in tree.findall('material'):
                 course = _update_metadata(material)
 
-                if course.source:
+                if not course.author and course.author_organization:
+                    source = course.author_organization
+                elif course.author:
+                    source = course.author
+                elif course.source:
                     source = course.source.provider.name
                 else:
-                    if not course.author and course.author_organization:
-                        source = course.author_organization
-                    elif course.author:
-                        source = course.author
-                    else:
-                        source = ''
+                    source = ''
 
                 doc = {
                     'description': course.description,
