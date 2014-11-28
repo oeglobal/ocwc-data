@@ -238,7 +238,10 @@ def search(request):
         params = {
             'licenseKey': settings.MERLOT_KEY,
             'page': page,
-            'keywords': q
+            'keywords': q,
+            'creativeCommons': 1,
+            'sort.property': 'overallRating',
+            'materialType': 'Online Course,Open Textbook'
         }
         data, count = _merlot_search(params)
 
