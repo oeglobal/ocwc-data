@@ -390,6 +390,8 @@ class CourseCategoryList(generics.ListAPIView):
                                 .values_list('id', flat=True))
 
                 lookup_params['merlot_categories__in'] = category_ids
+            except MerlotCategory.DoesNotExist:
+                return Course.objects.none()
 
             except ValueError:
                 pass
