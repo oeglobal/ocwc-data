@@ -170,7 +170,11 @@ def search(request):
         
         r = requests.get(settings.MERLOT_API_URL + '/materialsAdvanced.rest', params=params)
         tree = ET.fromstring(r.content, parser=parser)
-        num_results = int(tree.find('nummaterialstotal').text)
+
+        try:
+            num_results = int(tree.find('nummaterialstotal').text)
+        except AttributeError:
+            num_results = 0
 
 
         documents = []
