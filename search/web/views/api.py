@@ -97,7 +97,7 @@ def search(request):
             course = Course.objects.get(linkhash=Course.calculate_linkhash(url))
 
             if course.merlot_synced:
-                return Course
+                return course
 
         except Course.DoesNotExist:
             course = Course()
