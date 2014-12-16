@@ -195,7 +195,7 @@ def search(request):
                 else:
                     source = ''
 
-                provider_id = None
+                provider_id = ''
                 if course.source:
                     provider_id = course.source.provider.id
 
