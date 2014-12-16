@@ -94,6 +94,15 @@ def search(request):
     def _update_metadata(material):
         url = material.find('URL').text
         try:
+            course = Course.objects.get(linkhash=Course.calculate_linkhash(url))
+
+            if course.merlot_synced:
+                return Course
+
+        except Course.DoesNotExist:
+            course = Course()
+
+        try:
             photo_url = material.find('photoURL').text
         except AttributeError:
             photo_url = ''
@@ -129,11 +138,6 @@ def search(request):
             creativecommons = 'No'
 
         # course_data['language'] = language
-
-        try:
-            course = Course.objects.get(linkhash=Course.calculate_linkhash(url))
-        except Course.DoesNotExist:
-            course = Course()
 
         course_domain = urlsplit(url).netloc
         if Source.objects.filter(url__icontains=course_domain).exists():
@@ -191,6 +195,10 @@ def search(request):
                 else:
                     source = ''
 
+                provider_id = None
+                if course.source:
+                    provider_id = course.source.provider.id
+
                 doc = {
                     'description': course.description,
                     'language': ','.join([lang.name for lang in course.merlot_languages.all()]),
@@ -198,7 +206,10 @@ def search(request):
                     'is_member': bool(course.provider),
                     'source': source,
                     'link': course.linkurl,
-                    'id': course.linkhash
+                    'id': course.linkhash,
+                    'author': course.author or '',
+                    'author_organization': course.author_organization,
+                    'oec_provider_id': provider_id,
                 }
                 documents.append(doc)
 
