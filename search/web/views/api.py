@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
 import json
-import pysolarized
-import requests
 import datetime
 from collections import OrderedDict
-from lxml import etree
+
 from urllib import urlencode
-import xml.etree.ElementTree as ET
 from urlparse import urlsplit
+
+from lxml import etree
+import xml.etree.ElementTree as ET
+
+import pysolarized
+import requests
+import requests_cache
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -15,7 +19,6 @@ from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
-# from rest_framework.views import APIView
 from rest_framework import viewsets, generics
 
 from ..serializers import *
@@ -170,6 +173,9 @@ def search(request):
         return course
 
     def _merlot_search(params):
+        if settings.DEBUG:
+            requests_cache.install_cache('merlot')
+
         parser = etree.XMLParser(recover=True)
         
         r = requests.get(settings.MERLOT_API_URL + '/materialsAdvanced.rest', params=params)
@@ -186,18 +192,24 @@ def search(request):
             for material in tree.findall('material'):
                 course = _update_metadata(material)
 
-                if not course.author and course.author_organization:
+                if course.source:
+                    source = course.source.provider.name
+                elif course.author_organization:
+                    source = course.author_organization
+                elif not course.author and course.author_organization:
                     source = course.author_organization
                 elif course.author:
                     source = course.author
-                elif course.source:
-                    source = course.source.provider.name
                 else:
                     source = ''
 
                 provider_id = ''
                 if course.source:
                     provider_id = course.source.provider.id
+
+                cat_tree = []
+                for cat in course.merlot_categories.all():
+                    cat_tree.append('/'.join( ['All'] + map( unicode, cat.get_ancestors() ) + [cat.name] ) )
 
                 doc = {
                     'description': course.description,
@@ -210,6 +222,8 @@ def search(request):
                     'author': course.author or '',
                     'author_organization': course.author_organization,
                     'oec_provider_id': provider_id,
+                    'categories': cat_tree,
+                    'merlot_id': course.merlot_id
                 }
                 documents.append(doc)
 
