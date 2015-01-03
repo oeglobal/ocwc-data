@@ -68,6 +68,48 @@ def index(request):
 
 def search(request):
 
+    def _build_course_doc(course):
+        if course.source:
+            source = course.source.provider.name
+        elif course.author_organization:
+            source = course.author_organization
+        elif not course.author and course.author_organization:
+            source = course.author_organization
+        elif course.author:
+            source = course.author
+        else:
+            source = ''
+
+        provider_id = ''
+        if course.source:
+            provider_id = course.source.provider.id
+
+        cat_tree = []
+        for cat in course.merlot_categories.all():
+            cat_tree.append('/'.join( ['All'] + map( unicode, cat.get_ancestors() ) + [cat.name] ) )
+
+        if course.merlot_languages.exists():
+            language = ','.join([lang.name for lang in course.merlot_languages.all()])
+        else:
+            language = course.language
+
+        doc = {
+            'description': course.description,
+            'language': language,
+            'title': course.title,
+            'is_member': bool(course.provider),
+            'source': source,
+            'link': course.linkurl,
+            'id': course.linkhash,
+            'author': course.author or '',
+            'author_organization': course.author_organization,
+            'oec_provider_id': provider_id,
+            'categories': cat_tree,
+            'merlot_id': course.merlot_id
+        }
+
+        return doc
+
     def encode_obj(in_obj):
         """ http://stackoverflow.com/a/26568590/141200 """
 
@@ -192,39 +234,7 @@ def search(request):
             for material in tree.findall('material'):
                 course = _update_metadata(material)
 
-                if course.source:
-                    source = course.source.provider.name
-                elif course.author_organization:
-                    source = course.author_organization
-                elif not course.author and course.author_organization:
-                    source = course.author_organization
-                elif course.author:
-                    source = course.author
-                else:
-                    source = ''
-
-                provider_id = ''
-                if course.source:
-                    provider_id = course.source.provider.id
-
-                cat_tree = []
-                for cat in course.merlot_categories.all():
-                    cat_tree.append('/'.join( ['All'] + map( unicode, cat.get_ancestors() ) + [cat.name] ) )
-
-                doc = {
-                    'description': course.description,
-                    'language': ','.join([lang.name for lang in course.merlot_languages.all()]),
-                    'title': course.title,
-                    'is_member': bool(course.provider),
-                    'source': source,
-                    'link': course.linkurl,
-                    'id': course.linkhash,
-                    'author': course.author or '',
-                    'author_organization': course.author_organization,
-                    'oec_provider_id': provider_id,
-                    'categories': cat_tree,
-                    'merlot_id': course.merlot_id
-                }
+                doc = _build_course_doc(course)
                 documents.append(doc)
 
         return documents, num_results
@@ -245,11 +255,18 @@ def search(request):
 
         results = solr.query(q, **solr_kwargs)
         if results:
+
+            documents = []
+            for solr_doc in results.documents:
+                course = Course.objects.get(linkhash=solr_doc['id'])
+                doc = _build_course_doc(course)
+
+                documents.append(doc)
             
             response = {
                 'page': page,
                 'count': results.results_count,
-                'documents': results.documents
+                'documents': documents
             }
 
             if results.results_count > page * 10:
