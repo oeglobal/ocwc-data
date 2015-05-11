@@ -338,6 +338,7 @@ def search(request):
 def course_stats(request):
     return Response({
         'courses': Course.objects.all().count(),
+        'courses_ocw': Course.objects.filter(provider__isnull=False).count(),
         'providers': Provider.objects.all().count()
         })
 
