@@ -14,6 +14,10 @@ class Provider(models.Model):
     def __unicode__(self):
         return self.name
 
+    def get_merlot_count(self):
+        return Course.objects.filter(provider=self, merlot_present=True).count()
+
+
 SOURCE_KIND_CHOICES = (
     ('rss', 'RSS feed'),
     ('scraper', 'Gatherer scraper'),

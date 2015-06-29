@@ -75,9 +75,18 @@ class CourseSerializer(serializers.ModelSerializer):
 
 
 class ProviderSerializer(serializers.ModelSerializer):
+    course_count_merlot = serializers.SerializerMethodField('get_merlot_count')
+    course_count = serializers.SerializerMethodField('get_count')
+
     class Meta:
         model = Provider
-        fields = ('id', 'name', 'external_id')
+        fields = ('id', 'name', 'external_id', 'course_count_merlot', 'course_count')
+
+    def get_merlot_count(self, obj):
+        return obj.get_merlot_count()
+
+    def get_count(self, obj):
+        return Course.objects.filter(provider=obj).count()
 
 
 class CategoryListSerializer(serializers.ModelSerializer):
