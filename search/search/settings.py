@@ -67,6 +67,7 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -103,6 +104,7 @@ INSTALLED_APPS = (
     'crispy_forms',
     'crispy_forms_foundation',
     'django_select2',
+    'corsheaders',
 
     'search',
     'south',
@@ -167,5 +169,14 @@ RAVEN_CONFIG = {}
 
 CRISPY_TEMPLATE_PACK = 'foundation'
 AUTO_RENDER_SELECT2_STATICS = False
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework_jsonp.renderers.JSONPRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    )
+}
+CORS_ORIGIN_ALLOW_ALL = True
 
 from localsettings import *
