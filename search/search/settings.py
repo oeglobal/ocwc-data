@@ -83,7 +83,7 @@ ROOT_URLCONF = 'search.urls'
 WSGI_APPLICATION = 'search.wsgi.application'
 
 TEMPLATE_DIRS = (
-    next_to_root('search/web/templates')
+    next_to_root('search/web/templates'),
 )
 
 INSTALLED_APPS = (
@@ -101,17 +101,17 @@ INSTALLED_APPS = (
     'rest_framework',
     'mptt',
 
-    'crispy_forms',
-    'crispy_forms_foundation',
-    'django_select2',
+    # 'crispy_forms',
+    # 'crispy_forms_foundation',
+    # 'django_select2',
     'corsheaders',
 
     'search',
-    'south',
+    # 'south',
     'data',
-    'web',
+    # 'web',
     # 'joomla',
-    'members'
+    # 'members'
 )
 
 # A sample logging configuration. The only tangible logging

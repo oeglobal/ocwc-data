@@ -106,7 +106,7 @@ class Course(models.Model):
 
     provider = models.ForeignKey(Provider, null=True)
     source = models.ForeignKey(Source, null=True)
-    
+
     description = models.TextField()
     tags = models.TextField(blank=True)
 
@@ -116,7 +116,7 @@ class Course(models.Model):
     rights = models.TextField(default='', blank=True)
     contributors = models.CharField(max_length=765, blank=True, default='')
     license = models.TextField(blank=True, default='')
-    
+
     date_published = models.DateTimeField(auto_now_add=True)
     date_indexed = models.DateTimeField(auto_now=True)
     date_modified = models.DateTimeField(auto_now=True)
@@ -128,7 +128,7 @@ class Course(models.Model):
     calais_topics = models.TextField(blank=True)
     opencalais_response = models.TextField(blank=True)
 
-    categories = TreeManyToManyField('Category', blank=True, null=True)
+    categories = TreeManyToManyField('Category', blank=True)
 
     merlot_present = models.BooleanField(default=False)
     merlot_synced = models.BooleanField(default=False)
@@ -136,9 +136,9 @@ class Course(models.Model):
     merlot_id = models.IntegerField(null=True)
     merlot_ignore = models.BooleanField(default=False)
     merlot_material_type = models.CharField(max_length=100, default='', blank=True)
-    merlot_languages = models.ManyToManyField('MerlotLanguage', null=True)
+    merlot_languages = models.ManyToManyField('MerlotLanguage')
 
-    merlot_categories = TreeManyToManyField('MerlotCategory', blank=True, null=True)
+    merlot_categories = TreeManyToManyField('MerlotCategory', blank=True)
     merlot_url = models.TextField(blank=True, default='')
     merlot_xml = models.TextField(blank=True, default='')
 

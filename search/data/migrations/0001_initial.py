@@ -1,144 +1,158 @@
-# encoding: utf-8
-import datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
-class Migration(SchemaMigration):
-
-    def forwards(self, orm):
-        
-        # Adding model 'Provider'
-        db.create_table(u'data_provider', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('external_id', self.gf('django.db.models.fields.TextField')()),
-            ('active', self.gf('django.db.models.fields.BooleanField')(default=True)),
-        ))
-        db.send_create_signal(u'data', ['Provider'])
-
-        # Adding model 'Source'
-        db.create_table(u'data_source', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('provider', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['data.Provider'])),
-            ('kind', self.gf('django.db.models.fields.CharField')(default='rss', max_length=50)),
-            ('url', self.gf('django.db.models.fields.TextField')(default='', blank=True)),
-            ('update_speed', self.gf('django.db.models.fields.IntegerField')(default=0)),
-        ))
-        db.send_create_signal(u'data', ['Source'])
-
-        # Adding model 'Course'
-        db.create_table(u'data_course', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('title', self.gf('django.db.models.fields.TextField')()),
-            ('linkhash', self.gf('django.db.models.fields.CharField')(unique=True, max_length=96)),
-            ('linkurl', self.gf('django.db.models.fields.TextField')()),
-            ('provider', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['data.Provider'])),
-            ('source', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['data.Source'])),
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('tags', self.gf('django.db.models.fields.TextField')()),
-            ('language', self.gf('django.db.models.fields.CharField')(max_length=300)),
-            ('author', self.gf('django.db.models.fields.CharField')(default='', max_length=765)),
-            ('rights', self.gf('django.db.models.fields.TextField')(default='')),
-            ('contributors', self.gf('django.db.models.fields.CharField')(default='', max_length=765, blank=True)),
-            ('license', self.gf('django.db.models.fields.TextField')(default='', blank=True)),
-            ('date_published', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('date_indexed', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-            ('date_modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-        ))
-        db.send_create_signal(u'data', ['Course'])
-
-        # Adding model 'Log'
-        db.create_table(u'data_log', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('source', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['data.Source'])),
-            ('date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('status', self.gf('django.db.models.fields.IntegerField')(default=0)),
-        ))
-        db.send_create_signal(u'data', ['Log'])
-
-        # Adding M2M table for field processed_courses on 'Log'
-        db.create_table(u'data_log_processed_courses', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('log', models.ForeignKey(orm[u'data.log'], null=False)),
-            ('course', models.ForeignKey(orm[u'data.course'], null=False))
-        ))
-        db.create_unique(u'data_log_processed_courses', ['log_id', 'course_id'])
-
-        # Adding M2M table for field new_courses on 'Log'
-        db.create_table(u'data_log_new_courses', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('log', models.ForeignKey(orm[u'data.log'], null=False)),
-            ('course', models.ForeignKey(orm[u'data.course'], null=False))
-        ))
-        db.create_unique(u'data_log_new_courses', ['log_id', 'course_id'])
+from django.db import models, migrations
+import mptt.fields
 
 
-    def backwards(self, orm):
-        
-        # Deleting model 'Provider'
-        db.delete_table(u'data_provider')
+class Migration(migrations.Migration):
 
-        # Deleting model 'Source'
-        db.delete_table(u'data_source')
+    dependencies = [
+    ]
 
-        # Deleting model 'Course'
-        db.delete_table(u'data_course')
-
-        # Deleting model 'Log'
-        db.delete_table(u'data_log')
-
-        # Removing M2M table for field processed_courses on 'Log'
-        db.delete_table('data_log_processed_courses')
-
-        # Removing M2M table for field new_courses on 'Log'
-        db.delete_table('data_log_new_courses')
-
-
-    models = {
-        u'data.course': {
-            'Meta': {'object_name': 'Course'},
-            'author': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '765'}),
-            'contributors': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '765', 'blank': 'True'}),
-            'date_indexed': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'date_modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'date_published': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'description': ('django.db.models.fields.TextField', [], {}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'language': ('django.db.models.fields.CharField', [], {'max_length': '300'}),
-            'license': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
-            'linkhash': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '96'}),
-            'linkurl': ('django.db.models.fields.TextField', [], {}),
-            'provider': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['data.Provider']"}),
-            'rights': ('django.db.models.fields.TextField', [], {'default': "''"}),
-            'source': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['data.Source']"}),
-            'tags': ('django.db.models.fields.TextField', [], {}),
-            'title': ('django.db.models.fields.TextField', [], {})
-        },
-        u'data.log': {
-            'Meta': {'object_name': 'Log'},
-            'date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'new_courses': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'new_courses'", 'symmetrical': 'False', 'to': u"orm['data.Course']"}),
-            'processed_courses': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'processed_courses'", 'symmetrical': 'False', 'to': u"orm['data.Course']"}),
-            'source': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['data.Source']"}),
-            'status': ('django.db.models.fields.IntegerField', [], {'default': '0'})
-        },
-        u'data.provider': {
-            'Meta': {'object_name': 'Provider'},
-            'active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'external_id': ('django.db.models.fields.TextField', [], {}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'})
-        },
-        u'data.source': {
-            'Meta': {'object_name': 'Source'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'kind': ('django.db.models.fields.CharField', [], {'default': "'rss'", 'max_length': '50'}),
-            'provider': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['data.Provider']"}),
-            'update_speed': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'url': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'})
-        }
-    }
-
-    complete_apps = ['data']
+    operations = [
+        migrations.CreateModel(
+            name='Category',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(unique=True, max_length=50)),
+                ('lft', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('rght', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('tree_id', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('level', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('parent', mptt.fields.TreeForeignKey(related_name='children', blank=True, to='data.Category', null=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+        ),
+        migrations.CreateModel(
+            name='Course',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('title', models.TextField()),
+                ('linkhash', models.CharField(unique=True, max_length=96)),
+                ('linkurl', models.TextField(verbose_name='URL')),
+                ('description', models.TextField()),
+                ('tags', models.TextField(blank=True)),
+                ('language', models.CharField(max_length=300, choices=[(b'Catalan', b'Catalan'), (b'Chinese', b'Chinese'), (b'Dutch', b'Dutch'), (b'English', b'English'), (b'Finnish', b'Finnish'), (b'French', b'French'), (b'Galician', b'Galician'), (b'German', b'German'), (b'Hebrew', b'Hebrew'), (b'Indonesian', b'Indonesian'), (b'Italian', b'Italian'), (b'Japanese', b'Japanese'), (b'Korean', b'Korean'), (b'Malay', b'Malay'), (b'Persian', b'Persian'), (b'Polish', b'Polish'), (b'Portuguese', b'Portuguese'), (b'Russian', b'Russian'), (b'Slovenian', b'Slovenian'), (b'Spanish', b'Spanish'), (b'Turkish', b'Turkish')])),
+                ('author', models.CharField(default=b'', max_length=765)),
+                ('author_organization', models.TextField(default=b'', blank=True)),
+                ('rights', models.TextField(default=b'', blank=True)),
+                ('contributors', models.CharField(default=b'', max_length=765, blank=True)),
+                ('license', models.TextField(default=b'', blank=True)),
+                ('date_published', models.DateTimeField(auto_now_add=True)),
+                ('date_indexed', models.DateTimeField(auto_now=True)),
+                ('date_modified', models.DateTimeField(auto_now=True)),
+                ('content_medium', models.CharField(default=b'text', max_length=100, verbose_name='Content type', choices=[(b'text', b'Text'), (b'textbook', b'Textbook'), (b'video', b'Video'), (b'audio', b'Audio')])),
+                ('translated_text', models.TextField(blank=True)),
+                ('calais_socialtags', models.TextField(blank=True)),
+                ('calais_topics', models.TextField(blank=True)),
+                ('opencalais_response', models.TextField(blank=True)),
+                ('merlot_present', models.BooleanField(default=False)),
+                ('merlot_synced', models.BooleanField(default=False)),
+                ('merlot_synced_date', models.DateTimeField(null=True)),
+                ('merlot_id', models.IntegerField(null=True)),
+                ('merlot_ignore', models.BooleanField(default=False)),
+                ('merlot_material_type', models.CharField(default=b'', max_length=100, blank=True)),
+                ('merlot_url', models.TextField(default=b'', blank=True)),
+                ('merlot_xml', models.TextField(default=b'', blank=True)),
+                ('image_url', models.TextField(default=b'', blank=True)),
+                ('audience', models.IntegerField(null=True, choices=[(1, b'Grade School'), (2, b'Middle School'), (3, b'High School'), (4, b'College General Ed'), (5, b'College Lower Division'), (6, b'College Upper Division'), (7, b'Graduate School'), (8, b'Professional')])),
+                ('creative_commons', models.CharField(default=b'Unsure', max_length=30, verbose_name='Is CC Licensed?', choices=[(b'Yes', b'Yes'), (b'No', b'No'), (b'Unsure', b'Unsure')])),
+                ('creative_commons_commercial', models.CharField(default=b'', max_length=30, verbose_name='Is CC Commercial allowed?', blank=True, choices=[(b'Yes', b'Yes'), (b'No', b'No'), (b'Unsure', b'Unsure')])),
+                ('creative_commons_derivatives', models.CharField(default=b'', max_length=30, verbose_name='Is CC Derative work allowed or Share-Alike?', blank=True, choices=[(b'Yes', b'Yes'), (b'No', b'No'), (b'Sa', b'Share-Alike')])),
+                ('is_404', models.BooleanField(default=False)),
+                ('categories', mptt.fields.TreeManyToManyField(to='data.Category', null=True, blank=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Log',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('date', models.DateTimeField(auto_now_add=True)),
+                ('status', models.IntegerField(default=0)),
+                ('new_courses', models.ManyToManyField(related_name='new_courses', to='data.Course')),
+                ('processed_courses', models.ManyToManyField(related_name='processed_courses', to='data.Course')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='MerlotCategory',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=150)),
+                ('merlot_id', models.IntegerField()),
+                ('lft', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('rght', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('tree_id', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('level', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('parent', mptt.fields.TreeForeignKey(related_name='children', blank=True, to='data.MerlotCategory', null=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+        ),
+        migrations.CreateModel(
+            name='MerlotLanguage',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=150)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Provider',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=255)),
+                ('external_id', models.TextField(blank=True)),
+                ('active', models.BooleanField(default=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='SearchQuery',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('query', models.TextField()),
+                ('language', models.CharField(max_length=150, blank=True)),
+                ('count', models.IntegerField(default=1)),
+                ('added', models.DateTimeField(auto_now_add=True)),
+                ('processed', models.DateTimeField(null=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Source',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('kind', models.CharField(default=b'rss', max_length=50, choices=[(b'rss', b'RSS feed'), (b'scraper', b'Gatherer scraper'), (b'manual', b'Manual importer'), (b'form', b'Online form')])),
+                ('url', models.TextField(default=b'', blank=True)),
+                ('update_speed', models.IntegerField(default=0, help_text=b'Update speed in days, 0 to disable')),
+                ('edit_key', models.CharField(max_length=255, blank=True)),
+                ('provider', models.ForeignKey(to='data.Provider')),
+            ],
+        ),
+        migrations.AddField(
+            model_name='log',
+            name='source',
+            field=models.ForeignKey(to='data.Source'),
+        ),
+        migrations.AddField(
+            model_name='course',
+            name='merlot_categories',
+            field=mptt.fields.TreeManyToManyField(to='data.MerlotCategory', null=True, blank=True),
+        ),
+        migrations.AddField(
+            model_name='course',
+            name='merlot_languages',
+            field=models.ManyToManyField(to='data.MerlotLanguage', null=True),
+        ),
+        migrations.AddField(
+            model_name='course',
+            name='provider',
+            field=models.ForeignKey(to='data.Provider', null=True),
+        ),
+        migrations.AddField(
+            model_name='course',
+            name='source',
+            field=models.ForeignKey(to='data.Source', null=True),
+        ),
+    ]
