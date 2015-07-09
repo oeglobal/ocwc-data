@@ -28,12 +28,11 @@ from data.management.commands.merlot import MERLOT_LANGUAGE_SHORT
 @api_view(['GET'])
 def index(request):
     """
-    This is experimental Open Data API to Courses that are currently tracked by OpenCourseWare Consortium.
-
-    We are currently setting first version of API endpoints as we transition to this system. Please note that
-    API endpoints and/or return values might change at any time. We plan to finalize first version by the end of 2013.
+    This is v1 Open Data API to Courses that are currently tracked by OpenCourseWare Consortium. It is stable as of beginning 2015. We won't remove properties, but we might add additional ones.
 
     This API currently directly powers [OCWC course search][search].
+
+    There is also a [v2 of API][v2], where we're trying to make API conform to [JSON API schema][jsonapi]
 
     If you have any questions or comments please contact [Jure Cuhalev][jure].
 
@@ -45,6 +44,8 @@ def index(request):
     [search]: http://www.oeconsortium.org/courses/
     [github]: https://github.com/ocwc/ocwc-data
     [dbdump]: http://data.ocwconsortium.org/dbdump/
+    [jsonapi]: http://jsonapi.org/
+    [v2]: /api/v2/
     """
 
     return Response(OrderedDict([

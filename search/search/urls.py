@@ -10,6 +10,7 @@ urlpatterns = patterns('',
     url(r'^select2/', include('django_select2.urls')),
 
     url(r'api/v1/', include('web.urls_api', namespace='api')),
+    url(r'api/v2/', include('web.urls_api2', namespace='api2')),
     url(r'dashboard/', include('web.urls_dashboard', namespace='dashboard')),
     url(r'^$', 'web.views.api.index', name='api-root'),
 )

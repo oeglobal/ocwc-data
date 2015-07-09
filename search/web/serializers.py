@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from data.models import Course, Provider, MerlotCategory
+from data.models import Course, Provider, MerlotCategory, Source
 
 
 class CourseSeachResultsSerializer(serializers.ModelSerializer):
@@ -13,7 +13,7 @@ class CourseSeachResultsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ('id', 'link', 'title', 'description', 'author', 'author_organization', 
+        fields = ('id', 'link', 'title', 'description', 'author', 'author_organization',
                   'language', 'is_member', 'source', 'score', 'merlot_id')
 
     def get_score(self, obj):
@@ -108,3 +108,7 @@ class CategoryListSerializer(serializers.ModelSerializer):
             return obj.o_count
 
         return 0
+
+class SourceListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Source
