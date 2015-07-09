@@ -465,17 +465,16 @@ class CategoryList(generics.ListAPIView):
     model = MerlotCategory
 
     def get_queryset(self):
-        # qs = MerlotCategory.objects.filter(parent=None)
-        qs = MerlotCategory.objects.root_nodes()
+        qs = MerlotCategory.objects.filter(parent=None)
 
-        return MerlotCategory.objects.add_related_count(qs, Course, 'id', 'o_count', cumulative=True)
+        return MerlotCategory.objects.add_related_count(qs, Course, 'merlot_categories', 'o_count', True)
 
     def serialize_tree(self, queryset, language=None, depth=0, max_depth=-1):
         depth += 1
         for obj in queryset:
             data = CategoryListSerializer(obj, language=language).data
             if depth < max_depth:
-                children = MerlotCategory.objects.add_related_count(obj.children.all(), Course, 'id', 'o_count', True )
+                children = MerlotCategory.objects.add_related_count(obj.children.all(), Course, 'merlot_categories', 'o_count', True )
                 data['children'] = self.serialize_tree(children, language=language, depth=depth, max_depth=max_depth)
             yield data
 

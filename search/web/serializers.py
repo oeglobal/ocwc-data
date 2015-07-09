@@ -90,7 +90,7 @@ class ProviderSerializer(serializers.ModelSerializer):
 
 
 class CategoryListSerializer(serializers.ModelSerializer):
-    course_count = serializers.SerializerMethodField('get_course_count')
+    course_count = serializers.SerializerMethodField()
     category_id = serializers.CharField(source="merlot_id")
 
     class Meta:
