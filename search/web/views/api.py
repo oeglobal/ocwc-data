@@ -56,7 +56,7 @@ def index(request):
         ('providers-list', reverse('api:providers-list', request=request)),
         ('provider-detail', reverse('api:provider-detail', args=('1'), request=request)),
         ('provider-course-list', reverse('api:provider-courses-list', args=('1'), request=request)),
-        
+
         ('language-list', reverse('api:language-list', request=request)),
         ('language-courses-list', reverse('api:language-courses-list', kwargs={'language': 'English'}, request=request)),
 
@@ -188,7 +188,7 @@ def search(request):
         course_domain = urlsplit(url).netloc
         if Source.objects.filter(url__icontains=course_domain).exists():
             source = Source.objects.filter(url__icontains=course_domain)[0]
-            
+
             course.source = source
             course.provider = source.provider
 
@@ -220,7 +220,7 @@ def search(request):
             requests_cache.install_cache('merlot')
 
         parser = etree.XMLParser(recover=True)
-        
+
         r = requests.get(settings.MERLOT_API_URL + '/materialsAdvanced.rest', params=params)
         tree = ET.fromstring(r.content, parser=parser)
 
@@ -263,7 +263,7 @@ def search(request):
                 doc = _build_course_doc(course)
 
                 documents.append(doc)
-            
+
             response = {
                 'page': page,
                 'count': results.results_count,
@@ -346,7 +346,7 @@ def course_stats(request):
 class CourseDetail(generics.RetrieveAPIView):
     """
     Retrieve information on a specific course. Course identifier is MD5 hash of
-    course URL. It's not optimal, but I haven't found anything better. This means 
+    course URL. It's not optimal, but I haven't found anything better. This means
     that as courses get moved around it will change.
 
     In python you can generate it by running:
@@ -367,7 +367,7 @@ class CourseLatestList(generics.ListAPIView):
 
 class ProviderDetail(generics.RetrieveAPIView):
     """
-    Retrieve specific information about each provider. Providers are usually educational institutions 
+    Retrieve specific information about each provider. Providers are usually educational institutions
     from which we aggregate course data.
     """
     queryset = Provider.objects.all()
@@ -381,7 +381,7 @@ class ProviderCourseList(generics.ListAPIView):
         return Course.objects.filter(**self.kwargs).order_by('title')
     serializer_class = CourseListSerializer
     paginate_by = 25
-    paginate_by_param = 'limit'    
+    paginate_by_param = 'limit'
 
 class ProviderList(generics.ListAPIView):
     """
@@ -427,7 +427,7 @@ class CourseCategoryList(generics.ListAPIView):
     def get_queryset(self):
         category = self.kwargs.pop('category', None)
         language = self.kwargs.pop('language', None)
-        
+
         lookup_params = {'source__isnull': False}
         if category:
             try:
@@ -461,13 +461,14 @@ class CourseCategoryList(generics.ListAPIView):
 class CategoryList(generics.ListAPIView):
     """
     List all available Categories for Courses.
-    """    
+    """
     model = MerlotCategory
 
     def get_queryset(self):
-        qs = MerlotCategory.objects.filter(parent=None)
+        # qs = MerlotCategory.objects.filter(parent=None)
+        qs = MerlotCategory.objects.root_nodes()
 
-        return MerlotCategory.objects.add_related_count(qs, Course, 'id', 'o_count', True)
+        return MerlotCategory.objects.add_related_count(qs, Course, 'id', 'o_count', cumulative=True)
 
     def serialize_tree(self, queryset, language=None, depth=0, max_depth=-1):
         depth += 1

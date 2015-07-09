@@ -9,7 +9,7 @@ class CourseSeachResultsSerializer(serializers.ModelSerializer):
     score = serializers.SerializerMethodField('get_score')
     link = serializers.CharField(source='linkurl')
     id = serializers.CharField(source='linkhash')
-    language = serializers.SerializerMethodField('get_language')
+    language = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
@@ -28,8 +28,8 @@ class CourseSeachResultsSerializer(serializers.ModelSerializer):
         return ['English']
 
 class CourseListSerializer(serializers.ModelSerializer):
-    categories = serializers.RelatedField(source='merlot_categories', many=True)
-    language = serializers.SerializerMethodField('get_language')
+    categories = serializers.PrimaryKeyRelatedField(source='merlot_categories', many=True, read_only=True)
+    language = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
@@ -52,8 +52,8 @@ class CourseListSerializer(serializers.ModelSerializer):
 
 class CourseSerializer(serializers.ModelSerializer):
     provider_name = serializers.CharField(source='provider.name')
-    categories = serializers.RelatedField(source='merlot_categories', many=True)
-    language = serializers.SerializerMethodField('get_language')
+    categories = serializers.PrimaryKeyRelatedField(source='merlot_categories', many=True, read_only=True)
+    language = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
