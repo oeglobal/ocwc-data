@@ -6,7 +6,7 @@ urlpatterns = patterns('',
 	url(r'^providers/(?P<pk>\d+)/$', api.ProviderDetail.as_view(), name='provider-detail'),
 	url(r'^providers/$', api.ProviderList.as_view(), name='providers-list'),
 
-	url(r'^courses/stats/$', 'web.views.api.course_stats', name='course-stats'),	
+	url(r'^courses/stats/$', 'web.views.api.course_stats', name='course-stats'),
 	url(r'^courses/latest/$', api.CourseLatestList.as_view(), name='course-latest'),
 	url(r'^courses/view/(?P<linkhash>\w+)/$', api.CourseDetail.as_view(lookup_field='linkhash'), name='course-detail'),
 	url(r'^courses/search/$', 'web.views.api.search', name='search-query'),
@@ -16,7 +16,7 @@ urlpatterns = patterns('',
 
 	# url(r'^categories/(?P<category>[\w|\W]+)/(?P<language>[\w|\W]+)/$', views.CourseCategoryList.as_view(), name='category-course-list'),
 	url(r'^categories/(?P<category>[\w|\W]+)/$', api.CourseCategoryList.as_view(), name='category-course-list'),
-	
+
 	# url(r'^categories/(?P<language>[\w|\W]+)/$', api.CategoryList.as_view(), name='category-list'),
 	url(r'^categories/$', api.CategoryList.as_view(), name='category-list'),
-)	
+)

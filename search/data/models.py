@@ -44,6 +44,13 @@ class Source(models.Model):
     def __unicode__(self):
         return u"%s (%s)" % (self.provider.name, self.kind)
 
+    def get_merlot_missing(self):
+        return Course.objects.filter(source=self, merlot_present=False).count()
+
+    def get_total_count(self):
+        return Course.objects.filter(source=self).count()
+
+
 CONTENT_MEDIUM_CHOICES = (
     ('text', 'Text'),
     ('textbook', 'Textbook'),
@@ -173,6 +180,10 @@ class Course(models.Model):
         for cat in self.merlot_categories.all():
             paths.append(u'/'.join(force_unicode(i) for i in (['All'] + list(cat.get_ancestors()) + [cat])))
         return ';'.join(paths)
+
+    def get_merlot_detail_url(self):
+        if self.merlot_id:
+            return "http://www.merlot.org/merlot/viewMaterial.htm?id={0}".format(self.merlot_id)
 
     def is_member(self):
         if self.provider:

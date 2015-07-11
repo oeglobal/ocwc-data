@@ -109,6 +109,11 @@ class CategoryListSerializer(serializers.ModelSerializer):
 
         return 0
 
-class SourceListSerializer(serializers.ModelSerializer):
+class SourceSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='provider.name', read_only=True)
+    merlot_missing = serializers.CharField(source='get_merlot_missing', read_only=True)
+    course_count = serializers.CharField(source='get_total_count', read_only=True)
+
     class Meta:
         model = Source
+        fields = ('id', 'name', 'kind', 'merlot_missing', 'course_count')

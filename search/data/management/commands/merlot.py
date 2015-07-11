@@ -149,7 +149,7 @@ class Command(BaseCommand):
 
                 if params['page'] * 10 > num_results:
                     break
-                
+
                 params['page'] += 1
             else:
                 break
@@ -180,14 +180,14 @@ class Command(BaseCommand):
                 if cat not in course.merlot_categories.all():
                     course.merlot_categories.add(cat)
                     course.save()
-            
+
             # Fix Authors and Description
             sel = CSSSelector('[itemprop="author"]')
             authors = []
             for el in sel(h):
                 authors.append(el.text.strip())
             course.author = ', '.join(authors)
-            
+
             sel = CSSSelector('[itemprop="image"]')
             for el in sel(h):
                 course.image_url = 'http://ocw.mit.edu/' + el.get('src')
@@ -195,7 +195,7 @@ class Command(BaseCommand):
             sel = CSSSelector('meta[name="keywords"]')
             for el in sel(h):
                 course.tags = el.get('content')
-            
+
             # Set licensing metadata
             course.audience = 4
             course.creative_commons = 'Yes'
@@ -234,7 +234,7 @@ class Command(BaseCommand):
             print(course.linkurl)
 
     def _locate_local_url(self, url):
-        def __lookup_source(slug, source_id, lookup_type='icontaints'):
+        def __lookup_source(slug, source_id, lookup_type='icontains'):
             lookup_args = {
                 'linkurl__' + lookup_type: slug,
                 'source': source_id,
@@ -252,9 +252,15 @@ class Command(BaseCommand):
             except Course.MultipleObjectsReturned:
                 print("     -------")
                 print("Too many results", url, slug)
-                for i in Course.objects.filter(**lookup_args):
-                    print(i.id)
-                raise
+
+                for course in Course.objects.filter(**lookup_args):
+                    print course.linkurl, course.get_merlot_detail_url()
+
+                if Course.objects.filter(**lookup_args).filter(merlot_synced=True):
+                    print("Deleting {0}".format(Course.objects.filter(**lookup_args).filter(merlot_synced=False)))
+                    print("in favor of {0}".format(Course.objects.filter(**lookup_args).filter(merlot_synced=True)))
+
+                    Course.objects.filter(**lookup_args).filter(merlot_synced=False).delete()
 
         # Source: 8 - Johns Hopkins Bloomberg School of Public Health
         if url.startswith('http://ocw.jhsph.edu/'):
@@ -262,7 +268,7 @@ class Command(BaseCommand):
             if slug[-1] != '/':
                 slug += '/'
             return __lookup_source(slug, 8)
-        
+
         # Source: 13 - Massachusetts Institute of Technology
         if url.startswith('http://ocw.mit.edu/'):
             if url.endswith('.htm'):
@@ -284,7 +290,7 @@ class Command(BaseCommand):
                 path.remove(path[-1])
 
             slug = path[-1]
-            
+
             return __lookup_source(slug, 13)
 
         # Source: 59 - University of Notre Dame
@@ -494,7 +500,7 @@ class Command(BaseCommand):
         course_domain = urlsplit(url).netloc
         if Source.objects.filter(url__icontains=course_domain).exists():
             source = Source.objects.filter(url__icontains=course_domain)[0]
-            
+
             course.source = source
             course.provider = source.provider
 
@@ -534,7 +540,7 @@ class Command(BaseCommand):
 
                 if params['page'] * 10 > num_results or params['page'] > max_pages:
                     break
-                
+
                 params['page'] += 1
             else:
                 break
