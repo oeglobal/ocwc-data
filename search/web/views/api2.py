@@ -56,5 +56,4 @@ class CourseDetail(generics.RetrieveUpdateAPIView):
     serializer_class = CourseRetrieveUpdateSerializer
 
     def get_queryset(self, *args, **kwargs):
-        return Course.objects.filter(provider__active=True,
-                                     source__pk=self.kwargs.get('source_id'))
+        return Course.objects.filter(provider__active=True)
