@@ -113,7 +113,16 @@ class SourceSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='provider.name', read_only=True)
     merlot_missing = serializers.CharField(source='get_merlot_missing', read_only=True)
     course_count = serializers.CharField(source='get_total_count', read_only=True)
+    courses = serializers.PrimaryKeyRelatedField(source='course_set', many=True, read_only=True)
 
     class Meta:
         model = Source
-        fields = ('id', 'name', 'kind', 'merlot_missing', 'course_count')
+        fields = ('id', 'name', 'kind', 'merlot_missing', 'course_count', 'courses')
+
+class CourseRetrieveUpdateSerializer(serializers.ModelSerializer):
+    merlot_detail_url = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Course
+        fields = ('id', 'title', 'description', 'language',
+                    'merlot_present', 'merlot_detail_url')
