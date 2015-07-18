@@ -8,5 +8,7 @@ urlpatterns = patterns('',
             api2.SourceCourseList.as_view(), name='source-course-list'),
     url(r'^courses/(?P<pk>\d+)/$',
             api2.CourseDetail.as_view(), name='course-detail'),
+    url(r'^categories/$',
+            api2.FlatCategoryList.as_view(), name='category-list'),
 	url(r'^$', api2.index, name='api2-root'),
 )

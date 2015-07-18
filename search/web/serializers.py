@@ -126,3 +126,21 @@ class CourseRetrieveUpdateSerializer(serializers.ModelSerializer):
         model = Course
         fields = ('id', 'title', 'description', 'language',
                     'merlot_present', 'merlot_detail_url')
+
+class CategoryListSerializerAPI2(serializers.ModelSerializer):
+    merlot_id = serializers.CharField()
+
+    class Meta:
+        model = MerlotCategory
+        fields = ('id', 'name', 'merlot_id')
+
+class CategoryFlatListSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    merlot_id = serializers.CharField()
+
+    class Meta:
+        model = MerlotCategory
+        fields = ('id', 'name', 'merlot_id')
+
+    def get_name(self, obj):
+        return ' / '.join( map( unicode, obj.get_ancestors() ) + [obj.name] )
