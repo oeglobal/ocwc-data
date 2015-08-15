@@ -52,15 +52,16 @@ class CourseListSerializer(serializers.ModelSerializer):
 
 class CourseSerializer(serializers.ModelSerializer):
     provider_name = serializers.CharField(source='provider.name')
-    categories = serializers.PrimaryKeyRelatedField(source='merlot_categories', many=True, read_only=True)
+    categories = serializers.SerializerMethodField('transform_categories', read_only=True)
+    categories_ids = serializers.PrimaryKeyRelatedField(source='merlot_categories', many=True, read_only=True)
     language = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
         fields = ('linkhash', 'title', 'description', 'tags', 'provider', 'provider_name', 'language',
-                  'date_published', 'id', 'linkurl', 'author', 'categories', 'merlot_id')
+                  'date_published', 'id', 'linkurl', 'author', 'categories', 'merlot_id', 'categories_ids')
 
-    def transform_categories(self, obj, value):
+    def transform_categories(self, obj):
         cat_tree = []
         for cat in obj.merlot_categories.all():
             cat_tree.append('/'.join( ['All'] + map( unicode, cat.get_ancestors() ) + [cat.name] ) )
@@ -120,12 +121,15 @@ class SourceSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'kind', 'merlot_missing', 'course_count', 'courses')
 
 class CourseRetrieveUpdateSerializer(serializers.ModelSerializer):
+    source = serializers.CharField(source='source.provider.name', read_only=True)
     merlot_detail_url = serializers.CharField(read_only=True)
+    categories = serializers.PrimaryKeyRelatedField(source='merlot_categories', many=True, read_only=True)
 
     class Meta:
         model = Course
-        fields = ('id', 'title', 'description', 'language',
-                    'merlot_present', 'merlot_detail_url')
+        fields = ('source', 'id', 'title', 'description', 'language',
+                    'merlot_present', 'merlot_detail_url', 'categories')
+        read_only_fields = ('merlot_present',)
 
 class CategoryListSerializerAPI2(serializers.ModelSerializer):
     merlot_id = serializers.CharField()
