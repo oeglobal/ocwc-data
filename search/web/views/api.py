@@ -362,7 +362,7 @@ class CourseLatestList(generics.ListAPIView):
     """
     List latest Courses added to the database.
     """
-    queryset = Course.objects.all().order_by('-id')[:10]
+    queryset = Course.objects.all().exclude(provider__isnull=True).order_by('-id')[:10]
     serializer_class = CourseSerializer
 
 class ProviderDetail(generics.RetrieveAPIView):
