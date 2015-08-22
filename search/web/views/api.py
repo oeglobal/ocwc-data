@@ -289,7 +289,7 @@ def search(request):
             'keywords': q,
             'creativeCommons': 1,
             'sort.property': 'overallRating',
-            'materialType': 'Online Course,Open Textbook'
+            'materialType': ['Online Course', 'Open Textbook']
         }
         data, count = _merlot_search(params)
 
@@ -304,7 +304,6 @@ def search(request):
 
         if page > 1:
             response['previous_page'] = urlencode(encode_obj({'page': page-1, 'q': q}))
-
 
     else:
         response = {'error': 'Please use q parameter for search'}
