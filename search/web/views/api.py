@@ -473,7 +473,7 @@ class CategoryList(generics.ListAPIView):
         for obj in queryset:
             data = CategoryListSerializer(obj, language=language).data
             if depth < max_depth:
-                children = MerlotCategory.objects.add_related_count(obj.children.filter(course__source__isnull=False), Course, 'merlot_categories', 'o_count', True )
+                children = MerlotCategory.objects.add_related_count(obj.children.all().exclude(course__source__isnull=False), Course, 'merlot_categories', 'o_count', True )
                 data['children'] = self.serialize_tree(children, language=language, depth=depth, max_depth=max_depth)
             yield data
 

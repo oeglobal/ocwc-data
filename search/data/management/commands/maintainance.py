@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
-from django.core.management.base import BaseCommand
 import hashlib
+import requests
 from optparse import make_option
 
-from data.models import Course, Source
+from django.core.management.base import BaseCommand
+
+from data.models import Course
 
 class Command(BaseCommand):
     help = "One time mantainance operation on data models"
@@ -11,11 +13,14 @@ class Command(BaseCommand):
 
     option_list = BaseCommand.option_list + (
         make_option("--fix-hashes", action="store_true", dest="fix_hashes", help="Regenerates linkhash and removes duplicates"),
+        make_option("--check-404", action="store_true", dest="check_404", help="Checks for 404 links")
     )
 
     def handle(self, *args, **options):
         if options.get('fix_hashes'):
             self.fix_hashes()
+        if options.get('check_404'):
+            self.check_broken_links()
 
     def fix_hashes(self):
         # remove wrongly calculated hashes and generate new ones
@@ -32,16 +37,13 @@ class Command(BaseCommand):
                   course.save()
 
     def check_broken_links(self):
-        pass
-        # for jos_course in JosOcwCatalogCourses.objects.filter(pk__gt=6035):
-        #   try:
-        #       course = Course.objects.get(linkhash=jos_course.linkhash)
-        #   except Course.DoesNotExist:
-        #       # print jos_course.linkhash, jos_course.source, jos_course.title
-        #       # print [jos_course.source]
-        #       print jos_course.id, jos_course.linkurl
-        #       r = requests.get(jos_course.linkurl)
-        #       if r.status_code == 404:
-        #           print 'deleting'
-        #           jos_course.delete()
-        
+        for course in Course.objects.filter(is_404=False, merlot_url='', source__isnull=False).order_by('?'):
+            print(course.id, course.linkurl)
+            r = requests.get(course.linkurl)
+            if r.status_code == 404:
+                print(u'Removing: {} - {} ({})'.format(course.source.provider.name, course.title, course.linkurl))
+
+                course.is_404 = True
+                course.save()
+            else:
+                print('OK {}'.format(course.linkurl))
