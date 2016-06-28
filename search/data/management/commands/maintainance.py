@@ -44,7 +44,16 @@ class Command(BaseCommand):
     def check_broken_links(self, skip_sources):
         for course in Course.objects.filter(is_404=False, merlot_url='', source__isnull=False).exclude(source__in=skip_sources).order_by('source'):
             print(course.source.id, course.id, course.linkurl)
-            r = requests.get(course.linkurl)
+
+            try:
+                r = requests.get(course.linkurl)
+            except (requests.exceptions.MissingSchema, requests.exceptions.InvalidURL,):
+                print(u'Removing: {} - {} ({})'.format(course.source.provider.name, course.title, course.linkurl))
+
+                course.is_404 = True
+                course.save()
+                continue
+
             if r.status_code == 404:
                 print(u'Removing: {} - {} ({})'.format(course.source.provider.name, course.title, course.linkurl))
 
