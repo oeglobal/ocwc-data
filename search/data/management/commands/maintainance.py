@@ -37,7 +37,7 @@ class Command(BaseCommand):
                   course.save()
 
     def check_broken_links(self):
-        for course in Course.objects.filter(is_404=False, merlot_url='', source__isnull=False).order_by('?'):
+        for course in Course.objects.filter(is_404=False, merlot_url='', source__isnull=False).order_by('source'):
             print(course.id, course.linkurl)
             r = requests.get(course.linkurl)
             if r.status_code == 404:
