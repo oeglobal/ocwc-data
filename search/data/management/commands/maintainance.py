@@ -13,14 +13,19 @@ class Command(BaseCommand):
 
     option_list = BaseCommand.option_list + (
         make_option("--fix-hashes", action="store_true", dest="fix_hashes", help="Regenerates linkhash and removes duplicates"),
-        make_option("--check-404", action="store_true", dest="check_404", help="Checks for 404 links")
+        make_option("--check-404", action="store_true", dest="check_404", help="Checks for 404 links"),
+        make_option("--skip-sources", action="store", dest="skip_sources", help="Source IDs to skip")
     )
 
     def handle(self, *args, **options):
         if options.get('fix_hashes'):
             self.fix_hashes()
         if options.get('check_404'):
-            self.check_broken_links()
+            skip_sources = []
+            if options.get('skip_sources'):
+                skip_sources = options.get('skip_sources').split(',')
+
+            self.check_broken_links(skip_sources)
 
     def fix_hashes(self):
         # remove wrongly calculated hashes and generate new ones
@@ -36,9 +41,9 @@ class Command(BaseCommand):
                   course.linkhash = digest
                   course.save()
 
-    def check_broken_links(self):
-        for course in Course.objects.filter(is_404=False, merlot_url='', source__isnull=False).order_by('source'):
-            print(course.id, course.linkurl)
+    def check_broken_links(self, skip_sources):
+        for course in Course.objects.filter(is_404=False, merlot_url='', source__isnull=False).exclude(source__in=skip_sources).order_by('source'):
+            print(course.source.id, course.id, course.linkurl)
             r = requests.get(course.linkurl)
             if r.status_code == 404:
                 print(u'Removing: {} - {} ({})'.format(course.source.provider.name, course.title, course.linkurl))
