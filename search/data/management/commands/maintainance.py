@@ -42,7 +42,7 @@ class Command(BaseCommand):
                   course.save()
 
     def check_broken_links(self, skip_sources):
-        for course in Course.objects.filter(is_404=False, merlot_url='', source__isnull=False).exclude(source__in=skip_sources).order_by('source'):
+        for course in Course.objects.filter(is_404=False, merlot_url='', source__isnull=False, source__disabled=False).exclude(source__in=skip_sources).order_by('source'):
             print(course.source.id, course.id, course.linkurl)
 
             try:

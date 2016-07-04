@@ -25,13 +25,20 @@ SOURCE_KIND_CHOICES = (
     ('form', 'Online form'),
 )
 
+class SourceManager(models.Manager):
+    def active(self):
+        return super(SourceManager, self).get_queryset().filter(disabled=False)
+
 class Source(models.Model):
     provider = models.ForeignKey(Provider)
     kind = models.CharField(choices=SOURCE_KIND_CHOICES, default='rss', max_length=50)
     url  = models.TextField(blank=True, default='')
     update_speed = models.IntegerField(default=0, help_text='Update speed in days, 0 to disable')
+    disabled = models.BooleanField(default=False)
 
     edit_key = models.CharField(max_length=255, blank=True)
+
+    objects = SourceManager()
 
     def save(self, force_insert=False, force_update=False, using=None):
         if not self.edit_key:

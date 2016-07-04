@@ -406,7 +406,7 @@ class CourseList(generics.ListAPIView):
     paginate_by_param = 'limit'
 
     def get_queryset(self):
-        return Course.objects.filter(source__isnull=False, **self.kwargs)
+        return Course.objects.filter(source__isnull=False, source__disabled=False, **self.kwargs)
 
     def list(self, request, *args, **kwargs):
         response = super(CourseList, self).list(request, args, kwargs)
@@ -427,7 +427,7 @@ class CourseCategoryList(generics.ListAPIView):
         category = self.kwargs.pop('category', None)
         language = self.kwargs.pop('language', None)
 
-        lookup_params = {'source__isnull': False}
+        lookup_params = {'source__isnull': False, 'source__disabled': False}
         if category:
             try:
                 self.category = MerlotCategory.objects.get(merlot_id=category)
