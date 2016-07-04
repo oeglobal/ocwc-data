@@ -53,9 +53,10 @@ class Command(BaseCommand):
 
         link = 'http://www.ocwconsortium.org/courses/view/%s/'
 
-        for provider in Provider.objects.all():
-            for source in provider.source_set.active():
-                for course in source.course_set.all():
+        for provider in Provider.objects.filter(active=True):
+            for source in provider.source_set.filter(disabled=False):
+                for course in source.course_set.filter(is_404=False):
+                    print(course.id)
 
                     sheet.write(r, 0, link % course.linkhash)
                     sheet.write(r, 1, course.linkhash)
