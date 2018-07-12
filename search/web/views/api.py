@@ -242,8 +242,7 @@ def search(request):
 
 
     """Use `q` paramater to specify query string, `legacy=1` to use the old search"""
-
-    if request.GET.get('q') and request.GET.get(settings.MERLOT_ARG, None) == '1':
+    if request.GET.get('q') and request.GET.get(settings.MERLOT_ARG, None) != '1':
         q = request.GET.get('q')
         SOLR_URL = settings.SOLR_URL % 'default'
         solr = pysolarized.Solr(SOLR_URL)
