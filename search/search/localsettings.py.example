@@ -12,5 +12,6 @@ DATABASES = {
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'something_very_secret'
 
+
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
